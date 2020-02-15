@@ -1,5 +1,5 @@
 {
-  "name": "powercord",
+  "name": "powercord-for-discord-stable",
   "version": "1.0.0",
   "description": "A lightweight @discordapp client mod focused on simplicity and performance",
   "main": "index.js",
@@ -12,15 +12,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/powercord-org/powercord.git"
+    "url": "git+https://github.com/dream-frame/powercord-for-discord-stable.git"
   },
   "keywords": [],
   "author": "aetheryx",
   "license": "GPL-3.0",
   "bugs": {
-    "url": "https://github.com/powercord-org/powercord/issues"
+    "url": "https://github.com/dream-frame/powercord-for-discord-stable/issues"
   },
-  "homepage": "https://github.com/powercord-org/powercord#readme",
+  "homepage": "hhttps://github.com/dream-frame/powercord-for-discord-stable#readme",
   "dependencies": {
     "less": "^3.10.3",
     "node-watch": "^0.6.3",
