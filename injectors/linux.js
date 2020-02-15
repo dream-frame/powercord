@@ -20,9 +20,9 @@ const { existsSync } = require('fs');
 const { join } = require('path');
 
 const paths = [
-  '/usr/share/discord-canary',
-  '/usr/lib64/discord-canary',
-  '/opt/discord-canary'
+  '/usr/share/discord',
+  '/usr/lib64/discord',
+  '/opt/discord'
 ];
 
 exports.getAppDir = async () => {
