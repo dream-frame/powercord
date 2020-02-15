@@ -46,7 +46,7 @@ try {
       );
 
       console.log('Successfully plugged Powercord!');
-      console.log('NOTE: You've installed Powercord into Discord stable, which Powercord does NOT officially support. So there may be issues in the future.')
+      console.log('NOTE: You have installed Powercord into Discord stable, which Powercord does NOT officially support. So there may be issues in the future.')
       console.log('Report issues on Github: https://github.com/dream-frame/powercord/issues | or on Discord: https://KorbsStudio.com/discord/')
     }
   } else if (process.argv[2] === 'uninject') {
