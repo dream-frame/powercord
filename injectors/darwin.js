@@ -17,4 +17,4 @@
  */
 
 exports.getAppDir = async () =>
-  '/Applications/Discord Canary.app/Contents/Resources/app';
+  '/Applications/Discord.app/Contents/Resources/app';
