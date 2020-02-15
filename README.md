@@ -1,13 +1,12 @@
 # Powercord
 Powercord is a lightweight client mod focused on simplicity and performance.  
-As of right now, Powercord is in *very* early stages of development, so feel free to join [this server](https://discord.gg/5eSH46g) for any questions.
+As of right now, Powercord is in *very* early stages of development, so feel free to join [this server](https://discord.gg/5eSH46g) for any questions. Reminder that Powercord staff will not help you if you're using the stable version of Discord.
+
+# **DISCLAIMER / ABOUT THIS FORK**
+This fork is aimed to help users install Powercord onto the stable version of Discord. Powercord and their staff does not officially support the stable version of Discord, so there may be issues while using this fork.
 
 # Installation
-See the [installation page of the Powercord Wiki](https://github.com/powercord-org/powercord/wiki/Installation).
-
-# How can I install Powercord on Stable or PTB?
-You can't. We internally discussed about supporting all Discord channels and even ran an experiment about it, but that didn't give great results.
-Powercord was not able to run in some scenarios due to the huge internal differences and made the whole client unusable (crash on start).
+See the [installation page of the Powercord Wiki](https://github.com/dream-frame/powercord/wiki/Installation).
 
 # Is this against the ToS?
 Long story short... __yes__. Powercord is against the Discord Terms of Service — but, you should keep reading:  
