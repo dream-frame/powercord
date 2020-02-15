@@ -6,7 +6,7 @@ As of right now, Powercord is in *very* early stages of development, so feel fre
 This fork is aimed to help users install Powercord onto the stable version of Discord. Powercord and their staff does not officially support the stable version of Discord, so there may be issues while using this fork.
 
 # Installation
-See the [installation page of the Powercord Wiki](https://github.com/dream-frame/powercord/wiki/Installation).
+See the [installation page of the Powercord Wiki](https://github.com/dream-frame/powercord-for-discord-stable/wiki/Installation).
 
 # Is this against the ToS?
 Long story short... __yes__. Powercord is against the Discord Terms of Service — but, you should keep reading:  
