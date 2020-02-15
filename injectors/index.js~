@@ -46,8 +46,13 @@ try {
       );
 
       console.log('Successfully plugged Powercord!');
+<<<<<<< HEAD
       console.log('NOTE: You have installed Powercord into Discord stable, which Powercord does NOT officially support.');
       console.log('Report issues on Github: https://github.com/dream-frame/powercord/issues | or on Discord: https://KorbsStudio.com/discord/');
+=======
+      console.log('NOTE: You have installed Powercord into Discord stable, which Powercord does NOT officially support. So there may be issues in the future.')
+      console.log('Report issues on Github: https://github.com/dream-frame/powercord/issues | or on Discord: https://KorbsStudio.com/discord/')
+>>>>>>> 731338bbc9c3dfca907f23b4e820faf377cbbba5
     }
   } else if (process.argv[2] === 'uninject') {
     if (await main.uninject(platformModule)) {
