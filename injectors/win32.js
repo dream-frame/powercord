@@ -20,7 +20,7 @@ const { readdir } = require('fs').promises;
 const { join } = require('path');
 
 exports.getAppDir = async () => {
-  const discordPath = join(process.env.LOCALAPPDATA, 'DiscordCanary');
+  const discordPath = join(process.env.LOCALAPPDATA, 'Discord');
   const discordDirectory = await readdir(discordPath);
 
   const currentBuild = discordDirectory
