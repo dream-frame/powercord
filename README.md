@@ -1,3 +1,5 @@
+![image](https://cdn.discordapp.com/attachments/423853422261829653/678049416875212851/unknown.png)
+
 # Powercord
 Powercord is a lightweight client mod focused on simplicity and performance.  
 As of right now, Powercord is in *very* early stages of development, so feel free to join [this server](https://discord.gg/5eSH46g) for any questions. Reminder that Powercord staff will not help you if you're using the stable version of Discord.
