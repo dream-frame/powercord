@@ -10,8 +10,8 @@ This fork is aimed to help users install Powercord onto the stable version of Di
 # Installation
 See the [installation page of the Powercord Wiki](https://github.com/dream-frame/powercord-for-discord-stable/wiki/Installation).
 
-## Known Issues
- - Injection does not work on Windows
+## Known Issues 
+~~- Injection does not work on Windows
 
 # Is this against the ToS?
 Long story short... __yes__. Powercord is against the Discord Terms of Service — but, you should keep reading:  
