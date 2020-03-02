@@ -16,21 +16,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-const { join } = require('path');
-const { execSync } = require('child_process');
-
-exports.getAppDir = async () => {
-  const discordProcess = execSync('ps x')
-    .toString()
-    .split('\n')
-    .map(s => s.split(' ').filter(Boolean))
-    .find(p => p[4] && p[4].endsWith('Discord') && p.includes('--type=renderer'));
-
-  if (!discordProcess) {
-    return;
-  }
-
-  const discordPath = discordProcess[4].split('/');
-  discordPath.splice(discordPath.length - 1, 1);
-  return join('/', ...discordPath, 'resources', 'app');
-};
+require('fs')
+  .readdirSync(__dirname)
+  .filter(file => file !== 'index.js')
+  .forEach(filename => {
+    const moduleName = filename.split('.')[0];
+    exports[moduleName] = require(`${__dirname}/${filename}`);
+  });
