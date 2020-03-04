@@ -16,21 +16,22 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+const { existsSync } = require('fs');
 const { join } = require('path');
-const { execSync } = require('child_process');
+
+const paths = [
+  '/usr/share/discord',
+  '/usr/lib64/discord',
+  '/opt/discord'
+];
 
 exports.getAppDir = async () => {
-  const discordProcess = execSync('ps x')
-    .toString()
-    .split('\n')
-    .map(s => s.split(' ').filter(Boolean))
-    .find(p => p[4] && p[4].endsWith('Discord') && p.includes('--type=renderer'));
+  const discordPath = paths
+    .find(path => existsSync(path));
 
-  if (!discordProcess) {
-    return;
-  }
-
-  const discordPath = discordProcess[4].split('/');
-  discordPath.splice(discordPath.length - 1, 1);
-  return join('/', ...discordPath, 'resources', 'app');
+  return join(
+    discordPath,
+    'resources',
+    'app'
+  );
 };
