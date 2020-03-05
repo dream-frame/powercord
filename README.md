@@ -12,6 +12,7 @@ This fork is aimed to help users install Powercord onto the stable version of Di
 1. [Git](https://git-scm.com/downloads)
 2. [Node](https://nodejs.org) and [NPM](https://nodejs.org)
 3. Discord Stable(obviously)
+
 NOTE: Linux users, if you plan to use the script down below to install Powercord, it will install this for you.
 
 ## Installing Powercord
