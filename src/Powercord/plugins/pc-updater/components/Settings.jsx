@@ -202,17 +202,6 @@ module.exports = class UpdaterSettings extends React.Component {
         >
           {Messages.POWERCORD_UPDATES_OPTS_CHANGE_LOGS}
         </ButtonItem>
-        <ButtonItem
-          note={Messages.POWERCORD_UPDATES_OPTS_RELEASE_DESC}
-          button={powercord.gitInfos.branch === 'v2'
-            ? Messages.POWERCORD_UPDATES_OPTS_RELEASE_DEVELOP_BTN
-            : Messages.POWERCORD_UPDATES_OPTS_RELEASE_STABLE_BTN}
-          onClick={() => this.askChangeChannel(
-            () => this.plugin.changeBranch(powercord.gitInfos.branch === 'v2' ? 'v2-dev' : 'v2')
-          )}
-        >
-          {Messages.POWERCORD_UPDATES_OPTS_RELEASE}
-        </ButtonItem>
 
         <Category
           name={Messages.POWERCORD_UPDATES_OPTS_DEBUG}

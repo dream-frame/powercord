@@ -28,6 +28,7 @@ module.exports = class GeneralSettings extends React.Component {
           passphrase={this.passphrase.bind(this)}
           onAccount={() => this.forceUpdate()}
         />
+        <a id="JoinServerButton1" href="https://discord.gg/5eSH46g" target="_blank">Join Powercord's Server</a>
         <TextInput
           defaultValue={getSetting('prefix', '.')}
           onChange={p => updateSetting('prefix', !p ? '.' : p)}

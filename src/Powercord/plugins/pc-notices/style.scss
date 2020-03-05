@@ -32,7 +32,7 @@
   box-sizing: border-box;
   border-radius: 5px;
   position: absolute;
-  animation: slide-in .5s ease, shake 1.4s cubic-bezier(.36, .07, .19, .97) both;
+  animation: slide-in .5s ease, shake-pc 1.4s cubic-bezier(.36, .07, .19, .97) both;
   max-width: 600px;
   min-width: 223px;
   width: 320px;
@@ -154,7 +154,7 @@ $types: (
 }
 
 /*========== Animations ==========*/
-@keyframes shake {
+@keyframes shake-pc {
   10%, 90% {
     transform: translate3d(1px, 0, 0);
   }

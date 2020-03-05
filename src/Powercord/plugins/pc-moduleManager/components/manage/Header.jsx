@@ -14,14 +14,17 @@ module.exports = ({ type, experimental, search, onSearch, onOpenFolder, fetching
       title='Experimental feature'
       body={'This part of Powercord is experimental. Powercord Staff won\'t accept any bug reports nor provide support for it. Use it at your own risk!'}
     />}
+    <h3 id="paddingBottom">Installed {type}</h3>
     <div className='powercord-entities-manage-header'>
-      <h3>Installed {type}</h3>
       {experimental && <Button onClick={async () => {
         const { popLayer } = await getModule([ 'popLayer' ]);
         const { transitionTo } = await getModule([ 'transitionTo' ]);
         popLayer();
         transitionTo('/_powercord/store/plugins');
       }}>Explore {type[0].toUpperCase() + type.slice(1)}</Button>}
+      <div className='powercord-learn-install-plugins'>
+        <a href="https://github.com/dream-frame/powercord-for-discord-stable/#how-to-install-plugins-and-thems" target="_blank">Learn how to install plugins</a>
+      </div>
       <div className='powercord-entities-manage-fetch'>
         <Button disabled={fetching} color={Button.Colors.GREEN} look={Button.Looks.OUTLINED} onClick={onFetch}>
           {fetching

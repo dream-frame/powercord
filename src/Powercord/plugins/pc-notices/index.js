@@ -21,10 +21,6 @@ module.exports = class Toasts extends Plugin {
       this._welcomeNewUser();
       unlink(injectedFile);
     }
-
-    if (window.GLOBAL_ENV.RELEASE_CHANNEL !== 'canary') {
-      this._unsupportedBuild();
-    }
   }
 
   pluginWillUnload () {
@@ -54,7 +50,7 @@ module.exports = class Toasts extends Plugin {
   _welcomeNewUser () {
     this.sendAnnouncement('pc-first-welcome', {
       color: 'green',
-      message: 'Welcome! Powercord has been successfully injected into your Discord client. Feel free to join our Discord server for announcements, support and more!',
+      message: 'Powercord was installed successfully. Reminder that Powercord does not officially support the stable version of Discord, issues and crashes may occur.',
       button: {
         text: 'Join Server',
         onClick: async () => {

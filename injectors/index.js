@@ -46,7 +46,6 @@ try {
       );
 
       console.log('Successfully plugged Powercord!');
-      console.log('Wanna install Dream Frame real quick? On Linux, run "./install-dreamframe.sh" and the theme will install.')
     }
   } else if (process.argv[2] === 'uninject') {
     if (await main.uninject(platformModule)) {
