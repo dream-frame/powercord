@@ -9,6 +9,7 @@ This fork is aimed to help users install Powercord onto the stable version of Di
 
 # Installation
 ## Requirements
+Windows and OSX Users are required to install:
 1. [Git](https://git-scm.com/downloads)
 2. [Node](https://nodejs.org) and [NPM](https://nodejs.org)
 3. Discord Stable(obviously)
@@ -16,15 +17,17 @@ This fork is aimed to help users install Powercord onto the stable version of Di
 NOTE: Linux users, if you plan to use the script down below to install Powercord, it will install this for you.
 
 ## Installing Powercord
+### For Windows Users:
+A [setup](https://github.com/dream-frame/powercord-for-discord-stable/releases/download/v0.1/powercord.exe) file was created. File is unsigned, warnings will show up.
 ### For Linux users:
 ```
 wget "https://raw.githubusercontent.com/dream-frame/powercord-for-discord-stable/v2/install-powercord.sh"
 sudo ./install-powercord.sh
 ```
 The file will start installing git, nodejs v12, then Powercord. Make sure you're running the stable version of Discord.
-### For Windows and OSX users:
+### For OSX users:
 Please make sure you do have git and node installed
-1. Open command prompt if you're on Windows or open the terminal if you're using Linux/macOS
+1. Open your terminal
 2. Type the following commands in:
 
    `git clone https://github.com/dream-frame/powercord-for-discord-stable`
@@ -33,7 +36,7 @@ Please make sure you do have git and node installed
 
    `npm i`
 
-   `npm run plug` (Please use sudo if you're on Linux)
+   `npm run plug`
 
 3. Quit Discord entirely, make sure all process of Discord is killed
 4. Start discord and you should see that Powercord was successfully injected
