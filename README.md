@@ -17,17 +17,15 @@ Windows and OSX Users are required to install:
 NOTE: Linux users, if you plan to use the script down below to install Powercord, it will install this for you.
 
 ## Installing Powercord
-### For Windows Users:
-A [setup](https://github.com/dream-frame/powercord-for-discord-stable/releases/download/v0.1/powercord.exe) file was created. File is unsigned, warnings will show up.
 ### For Linux users:
 ```
 wget "https://raw.githubusercontent.com/dream-frame/powercord-for-discord-stable/v2/install-powercord.sh"
 sudo ./install-powercord.sh
 ```
 The file will start installing git, nodejs v12, then Powercord. Make sure you're running the stable version of Discord.
-### For OSX users:
+### For Windows and OSX users:
 Please make sure you do have git and node installed
-1. Open your terminal
+1. Open your terminal/CMD
 2. Type the following commands in:
 
    `git clone https://github.com/dream-frame/powercord-for-discord-stable`
