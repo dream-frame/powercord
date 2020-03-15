@@ -66,6 +66,7 @@ module.exports = class Powercord extends Updatable {
     if (isOverlay) { // eh
       // await sleep(250);
     }
+    await sleep(1e3);
 
     // Webpack & Modules
     await Webpack.init();
@@ -74,10 +75,7 @@ module.exports = class Powercord extends Updatable {
     // Start
     await this.startup();
     this.fetchAccount();
-
-    const { _options: { release: buildId } } = window.__SENTRY__.hub.getClient();
     this.gitInfos = await this.pluginManager.get('pc-updater').getGitInfos();
-    this.buildInfo = `Release Channel: ${window.GLOBAL_ENV.RELEASE_CHANNEL} - Discord's Build Number: ${buildId} - Powercord's git revision: ${this.gitInfos.revision}@${this.gitInfos.branch}`;
 
     // Token manipulation stuff
     if (this.settings.get('hideToken', true)) {
@@ -173,23 +171,14 @@ module.exports = class Powercord extends Updatable {
 
       if (resp.statusCode === 401) {
         if (!resp.body.error && resp.body.error !== 'DISCORD_REVOKED') {
-          const announcements = powercord.pluginManager.get('pc-announcements');
-          if (announcements) {
-            // even if the plugin is not ready yet, we can perform actions
-            announcements.sendNotice({
-              id: 'pc-account-discord-unlinked',
-              type: announcements.Notice.TYPES.RED,
-              message: 'Your Powercord account is no longer linked to your Discord account! Some integration will be disabled.',
-              button: {
-                text: 'Link it back',
-                onClick: () => {
-                  announcements.closeNotice('pc-account-discord-unlinked');
-                  openExternal(`${WEBSITE}/oauth/discord`);
-                }
-              },
-              alwaysDisplay: true
-            });
-          }
+          powercord.api.notices.sendAnnouncement('pc-account-discord-unlinked', {
+            color: 'red',
+            message: 'Your Powercord account is no longer linked to your Discord account! Some integration will be disabled.',
+            button: {
+              text: 'Link it back',
+              onClick: () => openExternal(`${WEBSITE}/oauth/discord`)
+            }
+          });
 
           this.isLinking = false;
           return; // keep token stored
@@ -244,43 +233,5 @@ module.exports = class Powercord extends Updatable {
       updater.settings.set('awaiting_reload', true);
     }
     return success;
-  }
-
-  // idk i was bored and people need to know the truth
-  get isEmmaCute () {
-    return () => true;
-  }
-
-  get isEmmaNotCute () {
-    return () => false;
-  }
-
-  get emma () {
-    // no u ain't going to make it negative uwu
-    const cuteIncrement = Math.max(0, this.settings.get('_cute_inc', 0));
-    this.settings.set('_cute_inc', cuteIncrement + 0.1);
-    return {
-      cute: true,
-      percent: 100.0 + cuteIncrement,
-      uwu: '🌺'
-    };
-  }
-
-  // No emma u wont edit those UwU
-  set emma (_) {
-    throw new Error('TooCuteException: awooooo');
-  }
-
-  set isEmmaCute (_) {
-    throw new Error('TooCuteException: awooooo');
-  }
-
-  set isEmmaNotCute (_) {
-    throw new Error('TooCuteException: awooooo');
-  }
-
-  // i was still bored
-  get daddy () {
-    return 'aeth uwu';
   }
 };
