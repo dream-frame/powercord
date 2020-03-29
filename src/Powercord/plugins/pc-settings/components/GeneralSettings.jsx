@@ -28,7 +28,13 @@ module.exports = class GeneralSettings extends React.Component {
           passphrase={this.passphrase.bind(this)}
           onAccount={() => this.forceUpdate()}
         />
-        <a id="JoinServerButton1" href="https://discord.gg/5eSH46g" target="_blank">Join Powercord's Server</a>
+        <div class="ETC1">
+          <h1>Etc</h1>
+          <div class="ETClinks">
+          <a id="buttonPC89" href="https://discord.gg/5eSH46g" target="_blank">Join Powercord's Server</a>
+          <a id="buttonPC89" href="#" target="_blank">Join Korbs' Support Server</a>
+          </div>
+        </div>
         <TextInput
           defaultValue={getSetting('prefix', '.')}
           onChange={p => updateSetting('prefix', !p ? '.' : p)}
@@ -66,9 +72,8 @@ module.exports = class GeneralSettings extends React.Component {
           <SwitchItem
             note2={Messages.POWERCORD_SETTINGS_OVERLAY_DESC}
             note='Overlay support is for now broken.'
-            value={getSetting('openOverlayDevTools', false)}
+            value={getSetting('openOverlayDevTools', true)}
             onChange={() => toggleSetting('openOverlayDevTools')}
-            disabled
           >
             {Messages.POWERCORD_SETTINGS_OVERLAY}
           </SwitchItem>

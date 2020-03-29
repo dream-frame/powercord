@@ -73,14 +73,40 @@
   }
 }
 
-a#JoinServerButton1 {
-  background: #7289DA;
-  padding: 11px 20px;
+a#buttonPC89 {
+  background: transparent;
+  padding: 0px;
   border-radius: 5px;
-  color: white;
-  position: absolute;
-  margin-top: -30px;
+  color: var(--text-link);
+  width: fit-content;
 }
+a#buttonPC89:hover {
+  text-decoration: underline;
+}
+.ETC1 h1 {
+  color: var(--channels-default);
+  position: absolute;
+  margin: -30px 0px 0px 0px;
+  font-weight: bold;
+  font-size: 15px;
+}
+.ETC1 {
+  height: 120px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-bottom: 40px;
+  background: var(--deprecated-card-bg);
+  border-radius: 5px;
+}
+.ETClinks a {
+  margin-top: 15px;
+}
+.ETClinks {
+  margin-top: 20px;
+}
+
 // Colors
 .theme-light .powercord-account {
   img {

@@ -137,6 +137,7 @@ module.exports = class UpdaterSettings extends React.Component {
             >
               {Messages.POWERCORD_UPDATES_DISABLE}
             </Button>
+            <a id="changelog" target="_blank" href="https://github.com/dream-frame/powercord-for-discord-stable/wiki/Change-Log">Changelog</a>
           </>)}
       </div>
       {!disabled && !paused && !checking && updates.length > 0 && <div className='updates'>
@@ -195,24 +196,6 @@ module.exports = class UpdaterSettings extends React.Component {
         >
           {Messages.POWERCORD_UPDATES_OPTS_CONCURRENCY}
         </TextInput>
-        <ButtonItem
-          note={Messages.POWERCORD_UPDATES_OPTS_CHANGE_LOGS_DESC}
-          button={Messages.POWERCORD_UPDATES_OPTS_CHANGE_LOGS}
-          onClick={() => this.plugin.openChangeLogs()}
-        >
-          {Messages.POWERCORD_UPDATES_OPTS_CHANGE_LOGS}
-        </ButtonItem>
-        <ButtonItem
-          note={Messages.POWERCORD_UPDATES_OPTS_RELEASE_DESC}
-          button={powercord.gitInfos.branch === 'v2'
-            ? Messages.POWERCORD_UPDATES_OPTS_RELEASE_DEVELOP_BTN
-            : Messages.POWERCORD_UPDATES_OPTS_RELEASE_STABLE_BTN}
-          onClick={() => this.askChangeChannel(
-            () => this.plugin.changeBranch(powercord.gitInfos.branch === 'v2' ? 'v2-dev' : 'v2')
-          )}
-        >
-          {Messages.POWERCORD_UPDATES_OPTS_RELEASE}
-        </ButtonItem>
 
         <Category
           name={Messages.POWERCORD_UPDATES_OPTS_DEBUG}
