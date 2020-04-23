@@ -44,7 +44,7 @@ module.exports = {
       .then(res =>
         res.body.find(connection =>
           connection.type === 'spotify'
-        )
+        ).id
       );
 
     return spotify.getAccessToken(spotifyUserID)

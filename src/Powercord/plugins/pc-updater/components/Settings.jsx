@@ -3,8 +3,8 @@ const { Clickable, Button, FormNotice, FormTitle, Tooltip } = require('powercord
 const { SwitchItem, TextInput, Category, ButtonItem } = require('powercord/components/settings');
 const { open: openModal, close: closeModal } = require('powercord/modal');
 const { Confirm } = require('powercord/components/modal');
-const { REPO_URL } = require('powercord/constants');
-const { clipboard } = require('electron');
+const { REPO_URL, CACHE_FOLDER } = require('powercord/constants');
+const { clipboard, shell } = require('electron');
 
 const Icons = require('./Icons');
 const Update = require('./Update');
@@ -137,7 +137,6 @@ module.exports = class UpdaterSettings extends React.Component {
             >
               {Messages.POWERCORD_UPDATES_DISABLE}
             </Button>
-            <a id="changelog" target="_blank" href="https://github.com/dream-frame/powercord-for-discord-stable/wiki/Change-Log">Changelog</a>
           </>)}
       </div>
       {!disabled && !paused && !checking && updates.length > 0 && <div className='updates'>
@@ -196,6 +195,24 @@ module.exports = class UpdaterSettings extends React.Component {
         >
           {Messages.POWERCORD_UPDATES_OPTS_CONCURRENCY}
         </TextInput>
+        <ButtonItem
+          note={Messages.POWERCORD_UPDATES_OPTS_CHANGE_LOGS_DESC}
+          button={Messages.POWERCORD_UPDATES_OPTS_CHANGE_LOGS}
+          onClick={() => this.plugin.openChangeLogs()}
+        >
+          {Messages.POWERCORD_UPDATES_OPTS_CHANGE_LOGS}
+        </ButtonItem>
+        <ButtonItem
+          note={Messages.POWERCORD_UPDATES_OPTS_RELEASE_DESC}
+          button={powercord.gitInfos.branch === 'v2'
+            ? Messages.POWERCORD_UPDATES_OPTS_RELEASE_DEVELOP_BTN
+            : Messages.POWERCORD_UPDATES_OPTS_RELEASE_STABLE_BTN}
+          onClick={() => this.askChangeChannel(
+            () => this.plugin.changeBranch(powercord.gitInfos.branch === 'v2' ? 'v2-dev' : 'v2')
+          )}
+        >
+          {Messages.POWERCORD_UPDATES_OPTS_RELEASE}
+        </ButtonItem>
 
         <Category
           name={Messages.POWERCORD_UPDATES_OPTS_DEBUG}
@@ -298,7 +315,8 @@ module.exports = class UpdaterSettings extends React.Component {
   // --- DEBUG STUFF (Intentionally left english-only)
   renderDebugInfo (moment) {
     const { getRegisteredExperiments, getExperimentOverrides } = getModule([ 'initialize', 'getExperimentOverrides' ], false);
-    const sentry = window.__SENTRY__.hub;
+    const { apiManager: { apis }, api: { commands: { commands }, settings: { store: { settings } } } } = powercord;
+    const superProperties = getModule([ 'getSuperPropertiesBase64' ], false).getSuperProperties();
     const plugins = powercord.pluginManager.getPlugins().filter(plugin =>
       !powercord.pluginManager.get(plugin).isInternal && powercord.pluginManager.isEnabled(plugin)
     );
@@ -330,12 +348,12 @@ module.exports = class UpdaterSettings extends React.Component {
     };
 
     const createPathReveal = (title, path) =>
-      <div
-        className='full-column'
-        onMouseEnter={() => this.setState({ pathsRevealed: true })}
-        onMouseLeave={() => this.setState({ pathsRevealed: false })}
-      >
-        {title}:&#10;{this.state.pathsRevealed ? path : maskPath(path)}
+      <div className='full-column'>
+        {title}:&#10;<a
+          onMouseEnter={() => this.setState({ pathsRevealed: true })}
+          onMouseLeave={() => this.setState({ pathsRevealed: false })}
+          onClick={() => shell.openItem(path)}
+        >{this.state.pathsRevealed ? path : maskPath(path)}</a>
       </div>;
 
     return <FormNotice
@@ -345,11 +363,14 @@ module.exports = class UpdaterSettings extends React.Component {
           <b>System / Discord:</b>
           <div className='row'>
             <div className='column'>Locale:&#10;{currentLocale}</div>
-            <div className='column'>OS:&#10;{window.platform.os.toString()}</div>
-            <div className='column'>Platform:&#10;{process.platform}</div>
-            <div className='column'>Release Channel:&#10;{window.GLOBAL_ENV.RELEASE_CHANNEL}</div>
-            <div className='column'>App Version:&#10;{sentry.getScope()._extra.hostVersion}</div>
-            <div className='column'>Build Number:&#10;{sentry.getClient()._options.release}</div>
+            <div className='column'>OS:&#10;{(window.platform.os).toString()}</div>
+            <div className='column'>Arch:&#10;{superProperties.os_arch}</div>
+            {process.platform === 'linux' && (
+              <div className='column'>Distro:&#10;{superProperties.distro}</div>
+            )}
+            <div className='column'>Release Channel:&#10;{superProperties.release_channel}</div>
+            <div className='column'>App Version:&#10;{superProperties.client_version}</div>
+            <div className='column'>Build Number:&#10;{superProperties.client_build_number}</div>
             <div className='column'>Build ID:&#10;{window.GLOBAL_ENV.SENTRY_TAGS.buildId}</div>
             <div className='column'>Experiments:&#10;{experimentOverrides} / {totalExperiments}</div>
           </div>
@@ -357,15 +378,15 @@ module.exports = class UpdaterSettings extends React.Component {
           <b>Process Versions:</b>
           <div className='row'>
             <div className='column'>React:&#10;{React.version}</div>
-            {[ 'electron', 'chrome', 'node' ].map(pkg =>
-              <div className='column'>{pkg.charAt(0).toUpperCase() + pkg.slice(1)}:&#10;{process.versions[pkg]}</div>
+            {[ 'electron', 'chrome', 'node' ].map(proc =>
+              <div className='column'>{proc.charAt(0).toUpperCase() + proc.slice(1)}:&#10;{process.versions[proc]}</div>
             )}
           </div>
 
           <b>Powercord:</b>
           <div className='row'>
-            <div className='column'>Commands:&#10;{powercord.api.commands.commands.length}</div>
-            <div className='column'>Settings:&#10;{Object.keys(powercord.api.settings.store.settings).length}</div>
+            <div className='column'>Commands:&#10;{commands.length}</div>
+            <div className='column'>Settings:&#10;{Object.keys(settings).length}</div>
             <div className='column'>Plugins:&#10;{powercord.pluginManager.getPlugins()
               .filter(plugin => powercord.pluginManager.isEnabled(plugin)).length} / {powercord.pluginManager.plugins.size}
             </div>
@@ -376,18 +397,14 @@ module.exports = class UpdaterSettings extends React.Component {
               .filter(experiment => experiments[experiment]).length} / ${Object.keys(experiments).length}`) || 'n/a'}
             </div>
             <div className='column'>{`Settings Sync:\n${powercord.settings.get('settingsSync', false)}`}</div>
-            {powercord.cacheFolder &&
-            <div className='column'>Cached Files:&#10;{require('fs')
-              .readdirSync(`${powercord.cacheFolder}/jsx`, (_, files) => files).length}
-            </div>
-            }
+            <div className='column'>Cached Files:&#10;{require('fs').readdirSync(`${CACHE_FOLDER}/jsx`).length}</div>
             <div className='column'>{`Account:\n${!!powercord.account}`}</div>
-            <div className='column'>APIs:&#10;{powercord.apiManager.apis.length}</div>
+            <div className='column'>APIs:&#10;{apis.length}</div>
           </div>
 
           <b>Git:</b>
           <div className='row'>
-            <div className='column'>Upstream:&#10;{powercord.gitInfos.upstream}</div>
+            <div className='column'>Upstream:&#10;{powercord.gitInfos.upstream.replace(REPO_URL, 'Official')}</div>
             <div className='column'>Revision:&#10;
               <a
                 href={`https://github.com/${powercord.gitInfos.upstream}/commit/${powercord.gitInfos.revision}`}
@@ -397,19 +414,17 @@ module.exports = class UpdaterSettings extends React.Component {
               </a>
             </div>
             <div className='column'>Branch:&#10;{powercord.gitInfos.branch}</div>
-            <div
-              className='column'>{`Latest:\n${!this.props.getSetting('updates', []).find(update => update.id === 'powercord')}`}</div>
+            <div className='column'>{`Latest:\n${!this.props.getSetting('updates', []).find(update => update.id === 'powercord')}`}</div>
           </div>
 
           <b>Listings:</b>
           <div className='row'>
             {createPathReveal('Powercord Path', powercord.basePath)}
             {createPathReveal('Discord Path', discordPath)}
-            <div
-              className='full-column'>Experiments:&#10;{(getExperimentOverrides() && Object.keys(getExperimentOverrides()).join(', ')) || 'n/a'}</div>
+            <div className='full-column'>Experiments:&#10;{(getExperimentOverrides() && Object.keys(getExperimentOverrides()).join(', ')) || 'n/a'}</div>
             <div className='full-column'>
               Plugins:&#10;{(plugins.length > 1 && `${(this.state.pluginsRevealed ? plugins : plugins.slice(0, 6)).join(', ')}; `) || 'n/a'}
-              {plugins.length > 1 &&
+              {plugins.length > 6 &&
               <Clickable tag='a' onClick={() => this.setState({ pluginsRevealed: !this.state.pluginsRevealed })}>
                 {this.state.pluginsRevealed ? 'Show less' : 'Show more'}
               </Clickable>}
@@ -419,7 +434,7 @@ module.exports = class UpdaterSettings extends React.Component {
         <Button
           size={Button.Sizes.SMALL}
           color={this.state.copied ? Button.Colors.GREEN : Button.Colors.BRAND}
-          onClick={() => this.handleDebugInfoCopy(moment)}
+          onClick={() => this.handleDebugInfoCopy(moment, plugins)}
         >
           {this.state.copied ? 'Copied!' : 'Copy'}
         </Button>
@@ -427,7 +442,7 @@ module.exports = class UpdaterSettings extends React.Component {
     />;
   }
 
-  handleDebugInfoCopy (moment) {
+  handleDebugInfoCopy (moment, plugins) {
     const extract = document.querySelector('.debugInfo > code')
       .innerText.replace(/(.*?):(?=\s(?!C:\\).*?:)/g, '\n[$1]').replace(/(.*?):\s(.*.+)/g, '$1="$2"').replace(/[ -](\w*(?=.*=))/g, '$1');
 
@@ -436,8 +451,7 @@ module.exports = class UpdaterSettings extends React.Component {
       `\`\`\`ini
       # Debugging Information | Result created: ${moment().calendar()}
       ${extract.substring(0, extract.indexOf('\nPlugins', extract.indexOf('\nPlugins') + 1))}
-      Plugins="${powercord.pluginManager.getPlugins().filter(plugin => !powercord.pluginManager.get(plugin).isInternal &&
-        powercord.pluginManager.isEnabled(plugin)).join(', ')}"
+      Plugins="${plugins.join(', ')}"
       \`\`\``.replace(/ {6}|n\/a/g, '').replace(/(?![0-9]{1,3}) \/ (?=[0-9]{1,3})/g, '/')
     );
     setTimeout(() => this.setState({ copied: false }), 2500);

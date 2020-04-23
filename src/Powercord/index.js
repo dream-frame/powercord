@@ -33,11 +33,42 @@ const StyleManager = require('./managers/styles');
 const APIManager = require('./managers/apis');
 const modules = require('./modules');
 
-module.exports = class Powercord extends Updatable {
+/**
+ * @typedef PowercordAPI
+ * @property {CommandsAPI} commands
+ * @property {SettingsAPI} settings
+ * @property {NoticesAPI} notices
+ * @property {KeybindsAPI} keybinds
+ * @property {RouterAPI} router
+ * @property {ConnectionsAPI} connections
+ * @property {I18nAPI} i18n
+ * @property {RPCAPI} rpc
+ * @property {LabsAPI} labs
+ */
+
+/**
+ * @typedef GitInfos
+ * @property {String} upstream
+ * @property {String} branch
+ * @property {String} revision
+ */
+
+/**
+ * Main Powercord class
+ * @type {Powercord}
+ * @property {PowercordAPI} api
+ * @property {StyleManager} styleManager
+ * @property {PluginManager} pluginManager
+ * @property {APIManager} apiManager
+ * @property {APIManager} account
+ * @property {GitInfos} gitInfos
+ * @property {Object|null} account
+ * @property {Boolean} initialized
+ */
+class Powercord extends Updatable {
   constructor () {
     super(join(__dirname, '..', '..'), '', 'powercord');
 
-    this.cacheFolder = join(__dirname, '..', '..', '.cache');
     this.api = {};
     this.gitInfos = {
       upstream: '???',
@@ -81,7 +112,7 @@ module.exports = class Powercord extends Updatable {
     if (this.settings.get('hideToken', true)) {
       const tokenModule = await require('powercord/webpack').getModule([ 'hideToken' ]);
       tokenModule.hideToken = () => void 0;
-      tokenModule.showToken(); // just to be sure
+      setImmediate(() => tokenModule.showToken()); // just to be sure
     }
 
     window.addEventListener('beforeunload', () => {
@@ -98,6 +129,7 @@ module.exports = class Powercord extends Updatable {
     // APIs
     await this.apiManager.startAPIs();
     this.settings = powercord.api.settings.buildCategoryObject('pc-general');
+    this.emit('settingsReady');
 
     // Style Manager
     this.styleManager.loadThemes();
@@ -173,7 +205,7 @@ module.exports = class Powercord extends Updatable {
         if (!resp.body.error && resp.body.error !== 'DISCORD_REVOKED') {
           powercord.api.notices.sendAnnouncement('pc-account-discord-unlinked', {
             color: 'red',
-            message: 'Your Powercord account is no longer linked to your Discord account! Some integration will be disabled.',
+            message: 'Your Powercord account is no longer linked to your Discord account! Some integrations will be disabled.',
             button: {
               text: 'Link it back',
               onClick: () => openExternal(`${WEBSITE}/oauth/discord`)
@@ -234,4 +266,6 @@ module.exports = class Powercord extends Updatable {
     }
     return success;
   }
-};
+}
+
+module.exports = Powercord;

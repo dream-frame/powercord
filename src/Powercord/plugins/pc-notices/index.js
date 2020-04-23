@@ -3,14 +3,14 @@ const { existsSync } = require('fs');
 const { unlink } = require('fs').promises;
 const { Plugin } = require('powercord/entities');
 const { React, getModule, getModuleByDisplayName, constants: { Routes } } = require('powercord/webpack');
-const { getOwnerInstance, waitFor } = require('powercord/util');
+const { forceUpdateElement, getOwnerInstance, waitFor } = require('powercord/util');
 const { inject, uninject } = require('powercord/injector');
 const { GUILD_ID, DISCORD_INVITE } = require('powercord/constants');
 
 const ToastContainer = require('./components/ToastContainer');
 const AnnouncementContainer = require('./components/AnnouncementContainer');
 
-module.exports = class Toasts extends Plugin {
+module.exports = class Notices extends Plugin {
   startPlugin () {
     this.loadCSS(resolve(__dirname, 'style.scss'));
     this._patchAnnouncements();
@@ -20,6 +20,10 @@ module.exports = class Toasts extends Plugin {
     if (existsSync(injectedFile)) {
       this._welcomeNewUser();
       unlink(injectedFile);
+    }
+
+    if (window.GLOBAL_ENV.RELEASE_CHANNEL !== 'canary') {
+      this._unsupportedBuild();
     }
   }
 
@@ -40,17 +44,21 @@ module.exports = class Toasts extends Plugin {
   }
 
   async _patchToasts () {
-    const Chat = await getModuleByDisplayName('Chat');
-    inject('pc-notices-toast', Chat.prototype, 'render', (_, res) => {
-      res.props.children.push(React.createElement(ToastContainer));
+    const { app } = await getModule([ 'app', 'layers' ]);
+    const Shakeable = await getModuleByDisplayName('Shakeable');
+    inject('pc-notices-toast', Shakeable.prototype, 'render', (_, res) => {
+      if (!res.props.children.find(child => child.type && child.type.name === 'ToastContainer')) {
+        res.props.children.push(React.createElement(ToastContainer));
+      }
       return res;
     });
+    forceUpdateElement(`.${app}`);
   }
 
   _welcomeNewUser () {
     this.sendAnnouncement('pc-first-welcome', {
       color: 'green',
-      message: 'Powercord was installed successfully. Reminder that Powercord does not officially support the stable version of Discord, issues and crashes may occur.',
+      message: 'Welcome! Powercord has been successfully injected into your Discord client. Feel free to join our Discord server for announcements, support and more!',
       button: {
         text: 'Join Server',
         onClick: async () => {

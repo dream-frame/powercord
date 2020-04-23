@@ -54,7 +54,7 @@ class PatchedBrowserWindow extends BrowserWindow {
 
       if (transparentWindow) {
         opts.transparent = true;
-        opts.frame = process.platform !== 'win32';
+        opts.frame = false;
         delete opts.backgroundColor;
       }
 
@@ -67,21 +67,37 @@ class PatchedBrowserWindow extends BrowserWindow {
   }
 }
 
-
-const electronExports = new Proxy(electron, {
-  get (target, prop) {
-    switch (prop) {
-      case 'BrowserWindow': return PatchedBrowserWindow;
-      default: return target[prop];
-    }
-  }
-});
+Object.assign(PatchedBrowserWindow, electron.BrowserWindow);
 
 delete require.cache[electronPath].exports;
-require.cache[electronPath].exports = electronExports;
+require.cache[electronPath].exports = {
+  deprecate: electron.deprecate,
+  BrowserWindow: PatchedBrowserWindow
+};
 
+const failedExports = [];
+for (const prop in electron) {
+  if (prop === 'BrowserWindow') {
+    continue;
+  }
+
+  try {
+    // noinspection JSUnfilteredForInLoop
+    Object.defineProperty(require.cache[electronPath].exports, prop, {
+      get () {
+        // noinspection JSUnfilteredForInLoop
+        return electron[prop];
+      }
+    });
+  } catch (_) {
+    // noinspection JSUnfilteredForInLoop
+    failedExports.push(prop);
+  }
+}
 
 app.once('ready', () => {
+  require.cache[electronPath].exports.BrowserWindow = PatchedBrowserWindow;
+
   // headers must die
   session.defaultSession.webRequest.onHeadersReceived(({ responseHeaders }, done) => {
     /*
@@ -113,10 +129,20 @@ app.once('ready', () => {
       done({});
     }
   });
+
+  for (const prop of failedExports) {
+    require.cache[electronPath].exports[prop] = electron[prop];
+  }
 });
 
 (async () => {
   if (process.argv[1] === '--squirrel-obsolete') {
+    /**
+     * @todo: Make this actually be working
+     * After further testing it looks like this is only called
+     * for versions that are way older (if new ver is 4, ver 2 will be
+     * called but not ver 3).
+     */
     const main = require('../injectors/main.js');
     const platform = require(`../injectors/${process.platform}.js`);
     await main.inject(platform);

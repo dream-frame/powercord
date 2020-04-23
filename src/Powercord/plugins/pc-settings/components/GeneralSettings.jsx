@@ -4,7 +4,7 @@ const { Icons: { FontAwesome } } = require('powercord/components');
 const { open: openModal, close: closeModal } = require('powercord/modal');
 const { TextInput, SwitchItem, ButtonItem, Category } = require('powercord/components/settings');
 const { Confirm } = require('powercord/components/modal');
-const { WEBSITE } = require('powercord/constants');
+const { WEBSITE, CACHE_FOLDER } = require('powercord/constants');
 const { rmdirRf } = require('powercord/util');
 
 const PassphraseModal = require('./PassphraseModal.jsx');
@@ -28,13 +28,6 @@ module.exports = class GeneralSettings extends React.Component {
           passphrase={this.passphrase.bind(this)}
           onAccount={() => this.forceUpdate()}
         />
-        <div class="ETC1">
-          <h1>Etc</h1>
-          <div class="ETClinks">
-          <a id="buttonPC89" href="https://discord.gg/5eSH46g" target="_blank">Join Powercord's Server</a>
-          <a id="buttonPC89" href="#" target="_blank">Join Korbs' Support Server</a>
-          </div>
-        </div>
         <TextInput
           defaultValue={getSetting('prefix', '.')}
           onChange={p => updateSetting('prefix', !p ? '.' : p)}
@@ -70,9 +63,18 @@ module.exports = class GeneralSettings extends React.Component {
           onChange={() => toggleSetting('advancedSettings')}
         >
           <SwitchItem
-            note2={Messages.POWERCORD_SETTINGS_OVERLAY_DESC}
-            note='Overlay support is for now broken.'
-            value={getSetting('openOverlayDevTools', true)}
+            note={Messages.POWERCORD_SETTINGS_DEBUG_LOGS_DESC}
+            value={getSetting('debugLogs', false)}
+            onChange={() => {
+              toggleSetting('debugLogs');
+              this.askRestart();
+            }}
+          >
+            {Messages.POWERCORD_SETTINGS_DEBUG_LOGS}
+          </SwitchItem>
+          <SwitchItem
+            note={Messages.POWERCORD_SETTINGS_OVERLAY_DESC}
+            value={getSetting('openOverlayDevTools', false)}
             onChange={() => toggleSetting('openOverlayDevTools')}
           >
             {Messages.POWERCORD_SETTINGS_OVERLAY}
@@ -168,7 +170,7 @@ module.exports = class GeneralSettings extends React.Component {
   clearPowercordCache () {
     this.setState({ powercordCleared: true });
     // noinspection JSDeprecatedSymbols
-    rmdirRf(powercord.cacheFolder).then(() => require.extensions['.jsx'].ensureFolder());
+    rmdirRf(CACHE_FOLDER).then(() => require.extensions['.jsx'].ensureFolder());
     setTimeout(() => {
       this.setState({ powercordCleared: false });
     }, 2500);
