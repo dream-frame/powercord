@@ -30,23 +30,25 @@ module.exports = () => {
   // Verify if we're on node 10.x
   const fs = require('fs');
   if (!fs.promises) {
-    console.error('You\'re on an outdated Node.js version. Powercord requires you to run at least Node 10. Did you not run the .sh file?');
+    console.error('You\'re on an outdated Node.js version. Powercord requires you to run at least Node 10. You can download it here: https://nodejs.org');
     process.exit(1);
   }
 
   // Verify if deps have been installed. If not, install them automatically
-  const { dependencies } = require('../package.json');
-
-  try {
-    for (const dependency in dependencies) {
-      // noinspection JSUnfilteredForInLoop
-      require(dependency);
-    }
-  } catch (_) {
-    console.log('Some dependencies are not installed. Let\'s fix that...');
-    execSync('npm install --only=prod', {
-      cwd: resolve(__dirname, '..'),
-      stdio: [ null, null, null ]
-    });
-  }
+  /*
+   * const { dependencies } = require('../package.json');
+   *
+   * try {
+   *   for (const dependency in dependencies) {
+   *     // noinspection JSUnfilteredForInLoop
+   *     require(dependency);
+   *   }
+   * } catch (_) {
+   *   console.log('Some dependencies are not installed. Let\'s fix that...');
+   *   execSync('npm install --only=prod', {
+   *     cwd: resolve(__dirname, '..'),
+   *     stdio: [ null, null, null ]
+   *   });
+   * }
+   */
 };
