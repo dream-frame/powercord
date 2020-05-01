@@ -1,5 +1,5 @@
 const { Plugin } = require('powercord/entities');
-const { React, getModule } = require('powercord/webpack');
+const { React, getModule, hljs } = require('powercord/webpack');
 const { inject, uninject } = require('powercord/injector');
 const { findInReactTree } = require('powercord/util');
 const { clipboard } = require('electron');
@@ -8,7 +8,6 @@ const { resolve } = require('path');
 module.exports = class Codeblocks extends Plugin {
   async startPlugin () {
     this.loadCSS(resolve(__dirname, 'style.scss'));
-    this.hljs = await getModule([ 'highlight' ]);
     this.patchCodeblocks();
   }
 
@@ -61,7 +60,7 @@ module.exports = class Codeblocks extends Plugin {
   renderCodeblock (lang, content) {
     const children = [];
     const isDangerouslySetInnerHTML = typeof content === 'object';
-    const isValidLanguage = typeof this.hljs.getLanguage(lang) !== 'undefined';
+    const isValidLanguage = typeof hljs.getLanguage(lang) !== 'undefined';
 
     children.push(React.createElement('div', {
       dangerouslySetInnerHTML: isDangerouslySetInnerHTML ? content : null
@@ -92,8 +91,14 @@ module.exports = class Codeblocks extends Plugin {
       target.classList.remove('copied');
     }, 1000);
 
+    const codeContent = target.parentElement.children[0];
+    const pcCopy = codeContent.querySelector('[data-powercord-codeblock-copy]');
+    if (pcCopy) {
+      return clipboard.writeText(pcCopy.textContent);
+    }
+
     const range = document.createRange();
-    range.selectNode(target.parentElement.children[0]);
+    range.selectNode(codeContent);
 
     const selection = window.getSelection();
     selection.removeAllRanges();

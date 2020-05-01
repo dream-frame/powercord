@@ -16,23 +16,30 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-const { existsSync } = require('fs');
 const { join } = require('path');
-
-const paths = [
-  '/usr/share/discord-canary',
-  '/usr/lib64/discord-canary',
-  '/opt/discord-canary',
-  '/opt/DiscordCanary'
-];
+const { existsSync } = require('fs');
+const { execSync } = require('child_process');
 
 exports.getAppDir = async () => {
-  const discordPath = paths
-    .find(path => existsSync(path));
+  const discordProcess = execSync('ps x')
+    .toString()
+    .split('\n')
+    .map(s => s.split(' ').filter(Boolean))
+    .find(p => p[4] && (/discord-?canary$/i).test(p[4]) && p.includes('--type=renderer'));
 
-  return join(
-    discordPath,
-    'resources',
-    'app'
-  );
+  if (!discordProcess) {
+    console.log('Cannot find Discord process, falling back to legacy path detection.');
+    const paths = [
+      '/usr/share/discord-canary',
+      '/usr/lib64/discord-canary',
+      '/opt/discord-canary',
+      '/opt/DiscordCanary'
+    ];
+    const discordPath = paths.find(path => existsSync(path));
+    return join(discordPath, 'resources', 'app');
+  }
+
+  const discordPath = discordProcess[4].split('/');
+  discordPath.splice(discordPath.length - 1, 1);
+  return join('/', ...discordPath, 'resources', 'app');
 };
