@@ -1,5 +1,5 @@
 /**
- * Powercord, a lightweight @discordapp client mod focused on simplicity and performance
+ * Powercord, a lightweight @discord client mod focused on simplicity and performance
  * Copyright (C) 2018-2020  aetheryx & Bowser65
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,12 +18,27 @@
 
 /* global appSettings */
 const Module = require('module');
+const { existsSync } = require('fs');
 const { join, dirname, resolve } = require('path');
 const electron = require('electron');
-const { BrowserWindow, app, session } = electron;
+let { BrowserWindow, app, session } = electron;
 
 const electronPath = require.resolve('electron');
 const discordPath = join(dirname(require.main.filename), '..', 'app.asar');
+
+console.log('Hello from Powercord!');
+
+/*
+ * Coming Soon:tm: - Release 0.0.7.1 (latest) contains broken code that has been fixed but not released yet.
+ * v0.1 is waiting for bugfixes, so we'll do further testing once that's released.
+ */
+const isGlasscord = false && existsSync(join(__dirname, '..', '.glasscord', 'glasscord.asar'));
+if (isGlasscord) {
+  console.log('Detected Glasscord');
+  require('../.glasscord/glasscord.asar');
+  // eslint-disable-next-line prefer-destructuring
+  BrowserWindow = require.cache[electronPath].exports.BrowserWindow; // Update our BrowserWindow ref
+}
 
 let settings;
 try {
@@ -31,7 +46,6 @@ try {
 } catch (err) {
   settings = {};
 }
-
 const { transparentWindow, experimentalWebPlatform } = settings;
 
 class PatchedBrowserWindow extends BrowserWindow {
@@ -52,7 +66,7 @@ class PatchedBrowserWindow extends BrowserWindow {
       opts.webPreferences.preload = join(__dirname, 'preload.js');
       opts.webPreferences.nodeIntegration = true;
 
-      if (transparentWindow) {
+      if (!isGlasscord && transparentWindow) {
         opts.transparent = true;
         opts.frame = false;
         delete opts.backgroundColor;
@@ -120,7 +134,7 @@ app.once('ready', () => {
     if (details.url.endsWith('.js.map')) {
       // source maps must die
       done({ cancel: true });
-    } else if (details.url.startsWith('https://canary.discordapp.com/_powercord')) {
+    } else if (details.url.startsWith('https://canary.discordapp.com/_powercord')) { // @todo: discord.com
       appSettings.set('_POWERCORD_ROUTE', details.url.replace('https://canary.discordapp.com', ''));
       appSettings.save();
       // It should get restored to _powercord url later
@@ -150,8 +164,9 @@ app.once('ready', () => {
   const discordPackage = require(join(discordPath, 'package.json'));
 
   electron.app.setAppPath(discordPath);
-  electron.app.setName(discordPackage.name);
+  electron.app.name = discordPackage.name;
 
+  console.log('Loading Discord');
   Module._load(
     join(discordPath, discordPackage.main),
     null,

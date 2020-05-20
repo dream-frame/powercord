@@ -1,5 +1,5 @@
 /**
- * Powercord, a lightweight @discordapp client mod focused on simplicity and performance
+ * Powercord, a lightweight @discord client mod focused on simplicity and performance
  * Copyright (C) 2018-2020  aetheryx & Bowser65
  *
  * This program is free software: you can redistribute it and/or modify
@@ -25,7 +25,7 @@ exports.getAppDir = async () => {
     .toString()
     .split('\n')
     .map(s => s.split(' ').filter(Boolean))
-    .find(p => p[4] && (/discord?$/i).test(p[4]) && p.includes('--type=renderer'));
+    .find(p => p[4] && (/discord$/i).test(p[4]) && p.includes('--type=renderer'));
 
   if (!discordProcess) {
     console.log('Cannot find Discord process, falling back to legacy path detection.');

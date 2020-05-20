@@ -1,1 +1,0 @@
-X=MsgBox("Powercord has been succesfully injected into Discord. If you have any issues, try contacting Korbs#0001.",num1+num2,"Powercord") 
