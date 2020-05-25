@@ -1,4 +1,4 @@
-#Powercord
+# Powercord
 ## For Discord Stable
 This fork is only meant for those who want to use Powercord on the stable channel of Discord. This fork is not offically supported and is not recommended, you may find a few things broken in future updates.
 ## How to install Powercord for Discord Stable
