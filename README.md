@@ -25,5 +25,5 @@ sudo sh install-powercord.sh
 The script will install Git, Node 12, NPM, Curl, and then inject Powercord for you. Once done, it will kill Discord then you'll have to re-open it and find that Powercord injected.
 
 ### What's broken in this fork
- - Development branch
+ - Development branch (If you're on the dev branch, [here is a fix](https://github.com/dream-frame/powercord-for-discord-stable/wiki/Troubleshooting#switch-back-from-dev-branch-to-stable-branch))
 
