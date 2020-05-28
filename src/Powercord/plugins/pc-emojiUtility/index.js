@@ -16,7 +16,7 @@ const {
 
 /* const { CDN_HOST } = window.GLOBAL_ENV; */
 
-const { /* ContextMenu, */ ContextMenu: { Submenu } } = require('powercord/components');
+const { ContextMenu } = require('powercord/components');
 const { getOwnerInstance } = require('powercord/util');
 const { inject, uninject } = require('powercord/injector');
 const { open: openModal } = require('powercord/modal');
@@ -221,8 +221,7 @@ module.exports = class EmojiUtility extends Plugin {
 
   async startPlugin () {
     await this.doImport();
-
-    this.loadCSS(resolve(__dirname, 'style.scss'));
+    this.loadStylesheet('style.scss');
 
     /* Default settings */
     this.settings.set('useEmbeds', this.settings.get('useEmbeds', false));
@@ -347,7 +346,7 @@ module.exports = class EmojiUtility extends Plugin {
 
       features.push({
         type: 'button',
-        name: 'Copy ID',
+        name: 'Copy Emote ID',
         onClick: () => clipboard.writeText(emoji.id)
       });
 
@@ -539,14 +538,17 @@ module.exports = class EmojiUtility extends Plugin {
       return args;
     });
 
-    this.registerSettings('pc-emojiUtility', 'Emote Utility', Settings);
+    powercord.api.settings.registerSettings('pc-emojiUtility', {
+      category: this.entityID,
+      label: 'Emote Utility',
+      render: Settings
+    });
 
-    this.registerCommand(
-      'findemote',
-      [],
-      'Find the server an emote is from',
-      '{c} [emote]',
-      (args) => {
+    powercord.api.commands.registerCommand({
+      command: 'findemote',
+      description: 'Find the server an emote is from',
+      usage: '{c} [emote]',
+      executor: (args) => {
         const object = this.findEmojisForCommand(args);
         if (!object) {
           return;
@@ -580,14 +582,13 @@ module.exports = class EmojiUtility extends Plugin {
           result: description
         };
       }
-    );
+    });
 
-    this.registerCommand(
-      'massemote',
-      [],
-      'Send all emotes containing the specified name',
-      '{c} [emote name]',
-      (args) => {
+    powercord.api.commands.registerCommand({
+      command: 'massemote',
+      description: 'Send all emotes containing the specified name',
+      usage: '{c} [emote name]',
+      executor: (args) => {
         const argument = args.join(' ').toLowerCase();
         if (argument.length === 0) {
           return this.replyError('Please provide an emote name');
@@ -597,7 +598,7 @@ module.exports = class EmojiUtility extends Plugin {
 
         const foundEmojis = emojis.filter(emoji => emoji.name.toLowerCase().includes(argument));
         if (foundEmojis.length > 0) {
-          const emojisAsString = foundEmojis.map(emoji => this.getFullEmoji(emoji)).join('');
+          const emojisAsString = foundEmojis.map(emoji => this.getFullEmoji(emoji)).join(' ');
           if (emojisAsString.length > 2000) {
             return {
               send: false,
@@ -620,14 +621,13 @@ module.exports = class EmojiUtility extends Plugin {
 
         return this.replyError(`Could not find any emotes containing **${argument}**`);
       }
-    );
+    });
 
-    this.registerCommand(
-      'saveemote',
-      [],
-      'Save emotes to a specified directory',
-      '{c} [emote]',
-      async (args) => {
+    powercord.api.commands.registerCommand({
+      command: 'saveemote',
+      description: 'Save emotes to a specified directory',
+      usage: '{c} [emote]',
+      executor: async (args) => {
         if (!this.settings.get('filePath')) {
           return this.replyError('Please set your save directory in the settings');
         }
@@ -686,14 +686,13 @@ module.exports = class EmojiUtility extends Plugin {
           this.replySuccess(`Successfully downloaded **${foundEmojis.length - failedDownloads.length}**/**${foundEmojis.length}** emotes`);
         }
       }
-    );
+    });
 
-    this.registerCommand(
-      'cloneemote',
-      [],
-      'Clone an emote to your own server',
-      '{c} [emote] [server]',
-      async (args) => {
+    powercord.api.commands.registerCommand({
+      command: 'cloneemote',
+      description: 'Clone an emote to your own server',
+      usage: '{c} [emote] [server]',
+      executor: async (args) => {
         if (args.length === 0) {
           return this.replyError('Please provide an emote');
         }
@@ -758,10 +757,15 @@ module.exports = class EmojiUtility extends Plugin {
           return this.replyError(`Could not find emote ${emojiRaw}`);
         }
       }
-    );
+    });
   }
 
   pluginWillUnload () {
+    powercord.api.settings.unregisterSettings('pc-emojiUtility');
+    powercord.api.commands.unregisterCommand('cloneemote');
+    powercord.api.commands.unregisterCommand('findemote');
+    powercord.api.commands.unregisterCommand('massemote');
+    powercord.api.commands.unregisterCommand('saveemote');
     uninject('pc-emojiUtility-emojiContext');
     uninject('pc-emojiUtility-reactionContext');
     uninject('pc-emojiUtility-hideEmojisPicker');
@@ -771,55 +775,33 @@ module.exports = class EmojiUtility extends Plugin {
   }
 
   async _injectContextMenu (cloneSubMenu, createSubMenu) {
-    const { contextMenu } = await getModule([ 'contextMenu' ]);
     const { imageWrapper } = await getModule([ 'imageWrapper' ]);
-
-    const callback = () =>
-      setTimeout(async () => {
-        const element = document.querySelector(`.${contextMenu}`);
-        if (element) {
-          const instance = getOwnerInstance(element);
-          if (instance._reactInternalFiber.child.child.pendingProps.type === 'MESSAGE_MAIN') {
-            window.removeEventListener('contextmenu', callback, true);
-            const fn = instance._reactInternalFiber.child.child.type;
-            const mdl = await getModule(m => m.default === fn);
-
-            // FINALLY inject
-            inject('pc-emojiUtility-emojiContext', mdl, 'default', ([ { target } ], res) => {
-              if (target.classList.contains('emoji')) {
-                const matcher = target.src.match(this.getEmojiUrlRegex());
-                if (matcher) {
-                  let emoji = this.getEmojiById(matcher[1]);
-                  if (emoji) {
-                    emoji.fake = false;
-                  } else {
-                    emoji = this.createFakeEmoji(matcher[1], target.alt.substring(1, target.alt.length - 1), target.src);
-                  }
-
-                  res.props.children.push(
-                    React.createElement(Submenu, {
-                      name: 'Emote',
-                      separate: true,
-                      getItems: () => cloneSubMenu(emoji)
-                    })
-                  );
-                }
-              } else if (target.tagName.toLowerCase() === 'img' && target.parentElement.classList.contains(imageWrapper)) {
-                res.props.children.push(
-                  React.createElement(Submenu, {
-                    name: 'Emote',
-                    separate: true,
-                    getItems: () => createSubMenu(target)
-                  })
-                );
-              }
-              return res;
-            });
-            instance.forceUpdate();
+    const { MenuSeparator } = await getModule([ 'MenuGroup' ]);
+    const mdl = await getModule(m => m.default && m.default.displayName === 'MessageContextMenu');
+    inject('pc-emojiUtility-emojiContext', mdl, 'default', ([ { target } ], res) => {
+      if (target.classList.contains('emoji')) {
+        const matcher = target.src.match(this.getEmojiUrlRegex());
+        if (matcher) {
+          let emoji = this.getEmojiById(matcher[1]);
+          if (emoji) {
+            emoji.fake = false;
+          } else {
+            emoji = this.createFakeEmoji(matcher[1], target.alt.substring(1, target.alt.length - 1), target.src);
           }
-        }
-      }, 5);
 
-    window.addEventListener('contextmenu', callback, true);
+          res.props.children.push(
+            React.createElement(MenuSeparator),
+            ...ContextMenu.renderRawItems(cloneSubMenu(emoji))
+          );
+        }
+      } else if (target.tagName.toLowerCase() === 'img' && target.parentElement.classList.contains(imageWrapper)) {
+        res.props.children.push(
+          React.createElement(MenuSeparator),
+          ...ContextMenu.renderRawItems(createSubMenu(target))
+        );
+      }
+      return res;
+    });
+    mdl.default.displayName = 'MessageContextMenu';
   }
 };
