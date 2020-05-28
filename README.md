@@ -23,3 +23,7 @@ wget "https://raw.githubusercontent.com/dream-frame/powercord-for-discord-stable
 sudo sh install-powercord.sh
 ```
 The script will install Git, Node 12, NPM, Curl, and then inject Powercord for you. Once done, it will kill Discord then you'll have to re-open it and find that Powercord injected.
+
+### What's broken in this fork
+ - Development branch
+
