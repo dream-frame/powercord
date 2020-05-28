@@ -9,6 +9,7 @@ const { MAGIC_CHANNELS: { CSS_SNIPPETS, STORE_PLUGINS, STORE_THEMES } } = requir
 const { join } = require('path');
 
 const commands = require('./commands');
+const deeplinks = require('./deeplinks');
 const i18n = require('./licenses/index');
 
 const Store = require('./components/store/Store');
@@ -19,20 +20,13 @@ const SnippetButton = require('./components/SnippetButton');
 module.exports = class ModuleManager extends Plugin {
   async startPlugin () {
     powercord.api.i18n.loadAllStrings(i18n);
-
-    Object.values(commands).forEach(cmd =>
-      this.registerCommand(cmd.command, cmd.aliases || [],
-        cmd.description, cmd.usage,
-        cmd.func, cmd.autocompleteFunc
-      )
-    );
+    Object.values(commands).forEach(cmd => powercord.api.commands.registerCommand(cmd));
 
     powercord.api.labs.registerExperiment({
       id: 'pc-moduleManager-themes2',
       name: 'New themes features',
       date: 1587857509321,
       description: 'New Theme management UI & settings',
-      usable: false,
       callback: () => {
         // We're supposed to do it properly but reload > all
         setImmediate(() => powercord.pluginManager.remount(this.entityID));
@@ -45,7 +39,18 @@ module.exports = class ModuleManager extends Plugin {
       name: 'Powercord Store',
       date: 1571961600000,
       description: 'Powercord Plugin and Theme store',
-      usable: false,
+      callback: () => {
+        // We're supposed to do it properly but reload > all
+        setImmediate(() => powercord.pluginManager.remount(this.entityID));
+        // And we wrap it in setImmediate to not break the labs UI
+      }
+    });
+
+    powercord.api.labs.registerExperiment({
+      id: 'pc-moduleManager-deeplinks',
+      name: 'Deeplinks',
+      date: 1590242558077,
+      description: 'Makes some powercord.dev links trigger in-app navigation, as well as some potential embedding if applicable',
       callback: () => {
         // We're supposed to do it properly but reload > all
         setImmediate(() => powercord.pluginManager.remount(this.entityID));
@@ -57,21 +62,47 @@ module.exports = class ModuleManager extends Plugin {
     this._quickCSSFile = join(__dirname, 'quickcss.css');
     this._loadQuickCSS();
     this._injectSnippets();
-    this.loadCSS(join(__dirname, 'scss', 'style.scss'));
-    this.registerSettings('pc-moduleManager-plugins', () => Messages.POWERCORD_PLUGINS, Plugins);
-    this.registerSettings('pc-moduleManager-themes', () => Messages.POWERCORD_THEMES, Themes);
+    this.loadStylesheet('scss/style.scss');
+    powercord.api.settings.registerSettings('pc-moduleManager-plugins', {
+      category: this.entityID,
+      label: () => Messages.POWERCORD_PLUGINS,
+      render: Plugins
+    });
+    powercord.api.settings.registerSettings('pc-moduleManager-themes', {
+      category: this.entityID,
+      label: () => Messages.POWERCORD_THEMES,
+      render: Themes
+    });
+
+    if (powercord.api.labs.isExperimentEnabled('pc-moduleManager-deeplinks')) {
+      deeplinks();
+    }
 
     if (powercord.api.labs.isExperimentEnabled('pc-moduleManager-store')) {
       this._injectCommunityContent();
-      this.registerRoute('/store/plugins', Store, true);
-      this.registerRoute('/store/themes', Store, true);
+      powercord.api.router.registerRoute({
+        path: '/store/plugins',
+        render: Store,
+        noSidebar: true
+      });
+      powercord.api.router.registerRoute({
+        path: '/store/themes',
+        render: Store,
+        noSidebar: true
+      });
     }
   }
 
   pluginWillUnload () {
     document.querySelector('#powercord-quickcss').remove();
+    powercord.api.router.unregisterRoute('/store/plugins');
+    powercord.api.router.unregisterRoute('/store/themes');
+    powercord.api.settings.unregisterSettings('pc-moduleManager-plugins');
+    powercord.api.settings.unregisterSettings('pc-moduleManager-themes');
     powercord.api.labs.unregisterExperiment('pc-moduleManager-store');
     powercord.api.labs.unregisterExperiment('pc-moduleManager-themes2');
+    powercord.api.labs.unregisterExperiment('pc-moduleManager-deeplinks');
+    Object.values(commands).forEach(cmd => powercord.api.commands.unregisterCommand(cmd.command));
     uninject('pc-moduleManager-channelItem');
     uninject('pc-moduleManager-channelProps');
     uninject('pc-moduleManager-snippets');
@@ -137,7 +168,7 @@ module.exports = class ModuleManager extends Plugin {
           const renderer = actions.type;
           actions.type = (props) => {
             const res = renderer(props);
-            if (props.channel.id === CSS_SNIPPETS && (/```(?:(?:s?css)|(?:styl(?:us)?)|less)/).test(props.message.content)) {
+            if (props.channel.id === CSS_SNIPPETS && (/```(?:(?:s?css)|(?:styl(?:us)?)|less)/i).test(props.message.content)) {
               res.props.children.unshift(
                 React.createElement(SnippetButton, {
                   message: props.message,
@@ -166,9 +197,9 @@ module.exports = class ModuleManager extends Plugin {
     css += ` * ${line2}\n`;
     css += ` * Snippet ID: ${message.id}\n`;
     css += ' */\n';
-    for (const m of message.content.matchAll(/```((?:s?css)|(?:styl(?:us)?)|less)\n?([\s\S]*)`{3}/g)) {
+    for (const m of message.content.matchAll(/```((?:s?css)|(?:styl(?:us)?)|less)\n?([\s\S]*)`{3}/ig)) {
       let snippet = m[2].trim();
-      switch (m[1]) {
+      switch (m[1].toLowerCase()) {
         case 'scss':
           snippet = '/* lol can\'t do scss for now */';
           break;

@@ -146,12 +146,11 @@ module.exports = (state, onButtonClick, hasCustomAuth, hasControlsHidden, hasIco
   [ {
     type: 'slider',
     name: 'Volume',
-    color: '#1ed860',
-    initialValue: state.volume,
-    onValueChange: (val) =>
+    value: state.volume,
+    onChange: (val) =>
       SpotifyPlayer.setVolume(Math.round(val))
         .then(() => true)
-  }, ...(hasCustomAuth && hasControlsHidden
+  } ], (hasCustomAuth && hasControlsHidden
     ? [ {
       type: 'button',
       name: 'Save to Liked Songs',
@@ -165,7 +164,7 @@ module.exports = (state, onButtonClick, hasCustomAuth, hasControlsHidden, hasIco
       onClick: () =>
         powercord.pluginManager.get('pc-spotify').openPlaylistModal(state.currentItem.id)
     } ]
-    : []) ],
+    : []),
 
   [ {
     type: 'button',
@@ -175,7 +174,16 @@ module.exports = (state, onButtonClick, hasCustomAuth, hasControlsHidden, hasIco
       shell.openExternal(state.currentItem.uri)
   }, {
     type: 'button',
-    name: 'Send URL to Channel',
+    name: 'Send Album URL to Channel',
+    icon: hasIconsHidden ? '' : 'share-square-duotone',
+    onClick: () =>
+      messages.sendMessage(
+        channels.getChannelId(),
+        { content: SpotifyPlayer.player.item.album.external_urls.spotify }
+      )
+  }, {
+    type: 'button',
+    name: 'Send Song URL to Channel',
     icon: hasIconsHidden ? '' : 'share-square-duotone',
     onClick: () =>
       messages.sendMessage(
@@ -184,7 +192,13 @@ module.exports = (state, onButtonClick, hasCustomAuth, hasControlsHidden, hasIco
       )
   }, {
     type: 'button',
-    name: 'Copy URL',
+    name: 'Copy Album URL',
+    icon: hasIconsHidden ? '' : 'copy-duotone',
+    onClick: () =>
+      clipboard.writeText(SpotifyPlayer.player.item.album.external_urls.spotify)
+  }, {
+    type: 'button',
+    name: 'Copy Song URL',
     icon: hasIconsHidden ? '' : 'copy-duotone',
     onClick: () =>
       clipboard.writeText(state.currentItem.url)
