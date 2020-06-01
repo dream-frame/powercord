@@ -23,6 +23,7 @@ clear
 
 echo "Installing Powercord..."
 git clone https://github.com/dream-frame/powercord-for-discord-stable
+sudo chmod -R 777 powercord-for-discord-stable
 cd powercord-for-discord-stable
 npm i
 clear
