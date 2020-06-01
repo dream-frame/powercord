@@ -12,6 +12,12 @@ class Themes extends Base {
   }
 
   render () {
+    if (this.state.settings) {
+      return (
+        <ThemeSettings theme={this.state.settings} onClose={() => this.setState({ settings: null })}/>
+      );
+    }
+
     const { topPill, item } = getModule([ 'topPill' ], false);
     return (
       <>
@@ -33,8 +39,11 @@ class Themes extends Base {
           ? super.render()
           : <QuickCSS openPopout={async () => {
             const popoutModule = await getModule([ 'setAlwaysOnTop', 'open' ]);
-            popoutModule.open('DISCORD_POWERCORD_QUICKCSS', () => (
-              <PopoutWindow windowId='DISCORD_POWERCORD_QUICKCSS'>
+            popoutModule.open('DISCORD_POWERCORD_QUICKCSS', (key) => (
+              <PopoutWindow
+                windowKey={key}
+                title='QuickCSS'
+              >
                 <QuickCSS popout={true}/>
               </PopoutWindow>
             ));
@@ -53,11 +62,6 @@ class Themes extends Base {
           <p>{Messages.POWERCORD_THEMES_WIP1}</p>
           <p>{Messages.POWERCORD_THEMES_WIP2}</p>
         </div>
-      );
-    }
-    if (this.state.settings) {
-      return (
-        <ThemeSettings theme={this.state.settings}/>
       );
     }
     return super.renderBody();
