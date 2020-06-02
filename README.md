@@ -18,7 +18,7 @@ NOTE: If you're Linux and had to use this method, run the last command as sudo.
 
 ### Linux
 A script has already been made for Linux users, if this doesn't work please use the Windows and macOS method.
-This script has been tested on Elementary OS 5.1.2, Ubuntu 18.04 LTS and 20.04 LTS, Zorin 15.1, Deepin 15.9 15.11 and 20.
+This script has been mainly tested on Ubuntu based distros.
 To download and run script, run this in your terminal:
 ```
 wget "https://raw.githubusercontent.com/dream-frame/powercord-for-discord-stable/v2/install/install-powercord.sh"
