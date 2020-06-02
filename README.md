@@ -25,4 +25,5 @@ sudo sh install-powercord.sh
 The script will install Git, Node 12, NPM, Curl, and then inject Powercord for you. Once done, it will kill Discord then you'll have to re-open it and find that Powercord injected.
 
 ### What's broken in this fork
- - Spotify modal is broken, controls don't show.
+ - ~~Development channel crashes Discord~~ Development branch removed from repo
+ - ~~Spotify modal is broken, controls don't show.~~ Only premium users can have this to prevent API abuse
