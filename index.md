@@ -1,37 +1,31 @@
-## Welcome to GitHub Pages
+# Powercord
+## For Discord Stable
+This fork is only meant for those who want to use Powercord on the stable channel of Discord. This fork is not offically supported and is not recommended, you may find a few things broken in future updates.
+## How to install Powercord for Discord Stable
+### Windows and macOS
+Step 1: Install [Git](https://git-scm.com/downloads) and [Node 12](https://nodejs.org/en/download/current/)
 
-You can use the [editor on GitHub](https://github.com/dream-frame/powercord-for-discord-stable/edit/master/index.md) to maintain and preview the content for your website in Markdown files.
+Step 2: Open Command Prompt or Powershell on Windows, for macOS open your terminal.
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
-
-### Markdown
-
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
-
-```markdown
-Syntax highlighted code block
-
-# Header 1
-## Header 2
-### Header 3
-
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
+Type in the following commands:
 ```
+git clone https://github.com/dream-frame/powercord-for-discord-stable/
+cd powercord-for-discord-stable
+npm i
+npm run plug
+```
+NOTE: If you're Linux and had to use this method, run the last command as sudo.
 
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
+### Linux
+A script has already been made for Linux users, if this doesn't work please use the Windows and macOS method.
+This script has been mainly tested on Ubuntu based distros.
+To download and run script, run this in your terminal:
+```
+wget "https://raw.githubusercontent.com/dream-frame/powercord-for-discord-stable/v2/install/install-powercord.sh"
+sudo sh install-powercord.sh
+```
+The script will install Git, Node 12, NPM, Curl, and then inject Powercord for you. Once done, it will kill Discord then you'll have to re-open it and find that Powercord injected.
 
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/dream-frame/powercord-for-discord-stable/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
+### What's broken in this fork
+ - ~~Development channel crashes Discord~~ Development branch removed from repo
+ - ~~Spotify modal is broken, controls don't show.~~ Only premium users can have this to prevent API abuse
