@@ -18,14 +18,14 @@ NOTE: If you're Linux and had to use this method, run the last command as sudo.
 
 ### Linux
 A script has already been made for Linux users, if this doesn't work please use the Windows and macOS method.
-This script has been mainly tested on Ubuntu based distros.
+This script has been mainly tested on Ubuntu based distros only. A script for Fedora and Arch will be made in the future.
 To download and run script, run this in your terminal:
 ```
 wget "https://raw.githubusercontent.com/dream-frame/powercord-for-discord-stable/v2/install/install-powercord.sh"
 sudo sh install-powercord.sh
 ```
-The script will install Git, Node 12, NPM, Curl, and then inject Powercord for you. Once done, it will kill Discord then you'll have to re-open it and find that Powercord injected.
+The script will first confirm that all requirements for Powercord is installed like Git, Node v12, and Curl.
+Once everything is confirmed, the script will download Powercord from Github and then inject into Discord.
 
 ### What's broken in this fork
- - ~~Development channel crashes Discord~~ Development branch removed from repo
- - ~~Spotify modal is broken, controls don't show.~~ Only premium users can have this to prevent API abuse
+*No known bugs as of now for this fork
