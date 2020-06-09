@@ -40,6 +40,28 @@ do
  ;;
  esac
  
+ 
+ 
+ read -r -p "Do you curl installed? [Y/n] " curl
+    
+     case $curl in
+         [yY][eE][sS]|[yY])
+     echo "Skipping curl..."
+     clear
+     break
+     ;;
+         [nN][oO]|[nN])
+     echo "Installing curl, please wait..."
+     sudo apt install curl --yes --quiet
+     clear
+     break
+            ;;
+         *)
+     echo "Invalid input..."
+     ;;
+     esac
+ 
+ 
   read -r -p "Do you have Node v12 installed? [Y/n] " node
  
   case $node in
@@ -61,25 +83,6 @@ do
   ;;
   esac
   
-    read -r -p "Do you curl installed? [Y/n] " curl
-   
-    case $curl in
-        [yY][eE][sS]|[yY])
-    echo "Skipping curl..."
-    clear
-    break
-    ;;
-        [nN][oO]|[nN])
-    echo "Installing curl, please wait..."
-    sudo apt install curl --yes --quiet
-    clear
-    break
-           ;;
-        *)
-    echo "Invalid input..."
-    ;;
-    esac
-
     read -r -p "Powercord is ready to install, inject now? [Y/n] " installPowercord
    
     case $installPowercord in
