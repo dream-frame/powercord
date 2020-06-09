@@ -20,8 +20,7 @@ NOTE: If you're Linux and had to use this method, run the last command as sudo.
 #### Ubuntu and Debian
 Script has been tested on Ubuntu 18.04, Ubuntu 20.04, Zorin OS 15, Elementary OS 5, and Deepin 20.
 ```
-wget "https://raw.githubusercontent.com/dream-frame/powercord-for-discord-stable/v2/install/install-powercord.sh"
-sudo sh install-powercord.sh
+bash <(wget -qO- https://raw.githubusercontent.com/dream-frame/powercord-for-discord-stable/v2/install/install-powercord.sh)
 ```
 #### Fedora
 Scripted has been tested on Fedora Workstation 1.6
