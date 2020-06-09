@@ -25,8 +25,8 @@ bash <(wget -qO- https://raw.githubusercontent.com/dream-frame/powercord-for-dis
 #### Fedora
 Scripted has been tested on Fedora Workstation 1.6
 ```
-wget "https://github.com/dream-frame/powercord-for-discord-stable/releases/download/v0.1/install-powercord-fedora.sh"
-sudo sh install-powercord-fedora.sh
+bash <(wget -qO- https://raw.githubusercontent.com/dream-frame/powercord-for-discord-stable/v2/install/install-powercord-fedora.sh)
+
 ```
 
 ### What's broken in this fork
