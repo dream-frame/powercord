@@ -17,15 +17,18 @@ npm run plug
 NOTE: If you're Linux and had to use this method, run the last command as sudo.
 
 ### Linux
-A script has already been made for Linux users, if this doesn't work please use the Windows and macOS method.
-This script has been mainly tested on Ubuntu based distros only. A script for Fedora and Arch will be made in the future.
-To download and run script, run this in your terminal:
+#### Ubuntu and Debian
+Script has been tested on Ubuntu 18.04, Ubuntu 20.04, Zorin OS 15, Elementary OS 5, and Deepin 20.
 ```
 wget "https://raw.githubusercontent.com/dream-frame/powercord-for-discord-stable/v2/install/install-powercord.sh"
 sudo sh install-powercord.sh
 ```
-The script will first confirm that all requirements for Powercord is installed like Git, Node v12, and Curl.
-Once everything is confirmed, the script will download Powercord from Github and then inject into Discord.
+#### Fedora
+Scripted has been tested on Fedora Workstation 1.6
+```
+wget "https://github.com/dream-frame/powercord-for-discord-stable/releases/download/v0.1/install-powercord-fedora.sh"
+sudo sh install-powercord-fedora.sh
+```
 
 ### What's broken in this fork
 *No known bugs as of now for this fork
