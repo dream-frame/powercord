@@ -1,4 +1,4 @@
-# Powercord
+# Powercord for Discord Stable
 ## Disclaimer
 Powercord for Discord stable is **__not recommended__** to be used as this is unofficial and unsupported, some things could break later on in the future.
 
@@ -8,7 +8,7 @@ This fork of Powercord should only be used if there are issues with Discord Cana
 ### Windows, Linux, and macOS
 Step 1: Install [Git](https://git-scm.com/downloads) and [Node 12](https://nodejs.org/en/download/current/)
 
-Step 2: Open Command Prompt or Powershell on Windows, for macOS open your terminal.
+Step 2: On Windows, open Powershell and for macOS and Linux open your terminal.
 
 Type in the following commands:
 ```
@@ -17,7 +17,7 @@ cd powercord-for-discord-stable
 npm i
 npm run plug
 ```
-NOTE: If you're on Linux and had to use this method, run the last command as sudo.
+NOTE: If you're on Linux, run the last command as sudo.
 
 ### What's broken
 *No known bugs as of now
