@@ -20,4 +20,4 @@ npm run plug
 NOTE: If you're on Linux, run the last command as sudo.
 
 ### What's broken
-*No known bugs as of now
+ - Powercord Labs does not show up when enabling experiemental options
