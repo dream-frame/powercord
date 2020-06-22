@@ -20,4 +20,5 @@ npm run plug
 NOTE: If you're on Linux, run the last command as sudo.
 
 ### What's broken
+ - **Discord doesn't load anymore**
  - SDK not available in Powercord Labs.
