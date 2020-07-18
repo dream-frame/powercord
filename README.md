@@ -3,6 +3,7 @@
 Powercord for Discord stable is **__not recommended__** to be used as this is unofficial and unsupported, some things could break later on in the future.
 
 This fork of Powercord should only be used if there are issues with Discord Canary, and should only be used *temporary* until the problem with Discord Canary is resolved. Once the issue is resolved, please go back to using the official [Powercord repo](https://github.com/powercord-org/powercord/), which I highly recommend you do.
+There are no plans for Discord PTB.
 
 ## How to install Powercord for Discord Stable
 ### Windows, Linux, and macOS
