@@ -40,11 +40,11 @@ const { transparentWindow, experimentalWebPlatform } = settings;
 class PatchedBrowserWindow extends BrowserWindow {
   // noinspection JSAnnotator - Make JetBrains happy
   constructor (opts) {
+    console.log(opts);
     if (opts.webContents) {
       // General purpose popouts used by Discord
     } else if (opts.webPreferences && opts.webPreferences.nodeIntegration) {
       // Splash Screen
-      console.log(opts);
       opts.webPreferences.preload = join(__dirname, 'preloadSplash.js');
     } else if (opts.webPreferences && opts.webPreferences.offscreen) {
       // Overlay
@@ -68,6 +68,7 @@ class PatchedBrowserWindow extends BrowserWindow {
       }
     }
 
+    opts.webPreferences.enableRemoteModule = true;
     return new BrowserWindow(opts);
   }
 }
