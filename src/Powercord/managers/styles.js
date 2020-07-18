@@ -399,10 +399,10 @@ module.exports = class StyleManager {
     } else {
       option.options.forEach(opt => {
         if (typeof opt !== 'object') {
-          errors.push(`Invalid select option: expected an object got ${typeof option.name}`);
+          errors.push(`Invalid select option: expected an object got ${typeof opt}`);
         } else {
-          if (typeof opt.name !== 'string') {
-            errors.push(`Invalid select option name: expected a string got ${typeof option.name}`);
+          if (typeof opt.label !== 'string') {
+            errors.push(`Invalid select option label: expected a string got ${typeof option.label}`);
           }
           if (typeof opt.value !== 'string') {
             errors.push(`Invalid select option value: expected a string got ${typeof option.name}`);
@@ -416,8 +416,6 @@ module.exports = class StyleManager {
   _validateSettingsNumber (option) {
     const errors = [];
     if (typeof option.limit !== 'undefined') {
-      errors.push('Invalid option: limit is required for numeric fields! Please refer to the documentation.');
-    } else {
       errors.push(...this._validateLimits(option.limit));
     }
     if (typeof option.markers !== 'undefined') {
