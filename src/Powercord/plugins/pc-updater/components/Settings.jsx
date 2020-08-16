@@ -1,24 +1,21 @@
 const { React, getModule, i18n: { Messages, chosenLocale: currentLocale } } = require('powercord/webpack');
-const { Clickable, Button, FormNotice, FormTitle, Tooltip } = require('powercord/components');
+const { Clickable, Button, FormNotice, FormTitle, Tooltip, Icons: { FontAwesome } } = require('powercord/components');
 const { SwitchItem, TextInput, Category, ButtonItem } = require('powercord/components/settings');
 const { open: openModal, close: closeModal } = require('powercord/modal');
 const { Confirm } = require('powercord/components/modal');
 const { REPO_URL, CACHE_FOLDER } = require('powercord/constants');
-const { clipboard, shell } = require('electron');
-const { readdirSync } = require('fs');
+const { clipboard } = require('electron');
+const { readdirSync, existsSync } = require('fs');
 
 const Icons = require('./Icons');
 const Update = require('./Update');
 
-module.exports = class UpdaterSettings extends React.Component {
+module.exports = class UpdaterSettings extends React.PureComponent {
   constructor () {
     super();
     this.plugin = powercord.pluginManager.get('pc-updater');
     this.state = {
       opened: false,
-      pathsRevealed: false,
-      pluginsRevealed: false,
-      debugInfoOpened: false,
       copied: false
     };
   }
@@ -324,7 +321,7 @@ module.exports = class UpdaterSettings extends React.Component {
 
     const enabledLabs = powercord.api.labs.experiments.filter(e => powercord.api.labs.isExperimentEnabled(e.id));
     const experimentOverrides = Object.keys(getExperimentOverrides()).length;
-    const totalExperiments = Object.keys(getRegisteredExperiments()).length;
+    const availableExperiments = Object.keys(getRegisteredExperiments()).length;
 
     const discordPath = process.resourcesPath.slice(0, -10);
     const maskPath = (path) => {
@@ -337,28 +334,28 @@ module.exports = class UpdaterSettings extends React.Component {
       return path;
     };
 
-    const cachedFiles = readdirSync(CACHE_FOLDER)
+    const cachedFiles = (existsSync(CACHE_FOLDER) && readdirSync(CACHE_FOLDER)
       .map(d => readdirSync(`${CACHE_FOLDER}/${d}`))
-      .flat().length;
+      .flat().length) || 'n/a';
 
     const createPathReveal = (title, path) =>
       <div className='full-column'>
         {title}:&#10;<a
           onMouseEnter={() => this.setState({ pathsRevealed: true })}
           onMouseLeave={() => this.setState({ pathsRevealed: false })}
-          onClick={() => shell.openItem(path)}
+          onClick={() => window.DiscordNative.fileManager.showItemInFolder(path)}
         >{this.state.pathsRevealed ? path : maskPath(path)}</a>
       </div>;
 
     return <FormNotice
       type={FormNotice.Types.PRIMARY}
-      body={<div className='debugInfo'>
+      body={<div className={[ 'debug-info', this.state.copied && 'copied' ].filter(Boolean).join(' ')}>
         <code>
-          <b>System / Discord:</b>
+          <b>System / Discord </b>
           <div className='row'>
             <div className='column'>Locale:&#10;{currentLocale}</div>
             <div className='column'>OS:&#10;{(window.platform.os).toString()}</div>
-            <div className='column'>Arch:&#10;{superProperties.os_arch}</div>
+            <div className='column'>Architecture:&#10;{superProperties.os_arch}</div>
             {process.platform === 'linux' && (
               <div className='column'>Distro:&#10;{superProperties.distro}</div>
             )}
@@ -366,10 +363,10 @@ module.exports = class UpdaterSettings extends React.Component {
             <div className='column'>App Version:&#10;{superProperties.client_version}</div>
             <div className='column'>Build Number:&#10;{superProperties.client_build_number}</div>
             <div className='column'>Build ID:&#10;{window.GLOBAL_ENV.SENTRY_TAGS.buildId}</div>
-            <div className='column'>Experiments:&#10;{experimentOverrides} / {totalExperiments}</div>
+            <div className='column'>Experiments:&#10;{experimentOverrides} / {availableExperiments}</div>
           </div>
 
-          <b>Process Versions:</b>
+          <b>Process Versions </b>
           <div className='row'>
             <div className='column'>React:&#10;{React.version}</div>
             {[ 'electron', 'chrome', 'node' ].map(proc =>
@@ -377,9 +374,9 @@ module.exports = class UpdaterSettings extends React.Component {
             )}
           </div>
 
-          <b>Powercord:</b>
+          <b>Powercord </b>
           <div className='row'>
-            <div className='column'>Commands:&#10;{commands.length}</div>
+            <div className='column'>Commands:&#10;{Object.keys(commands).length}</div>
             <div className='column'>Settings:&#10;{Object.keys(settingsStore.getAllSettings()).length}</div>
             <div className='column'>Plugins:&#10;{powercord.pluginManager.getPlugins()
               .filter(plugin => powercord.pluginManager.isEnabled(plugin)).length} / {powercord.pluginManager.plugins.size}
@@ -395,7 +392,7 @@ module.exports = class UpdaterSettings extends React.Component {
             <div className='column'>APIs:&#10;{apis.length}</div>
           </div>
 
-          <b>Git:</b>
+          <b>Git </b>
           <div className='row'>
             <div className='column'>Upstream:&#10;{powercord.gitInfos.upstream.replace(REPO_URL, 'Official')}</div>
             <div className='column'>Revision:&#10;
@@ -410,16 +407,17 @@ module.exports = class UpdaterSettings extends React.Component {
             <div className='column'>{`Latest:\n${!this.props.getSetting('updates', []).find(update => update.id === 'powercord')}`}</div>
           </div>
 
-          <b>Listings:</b>
+          <b>Listings </b>
           <div className='row'>
             {createPathReveal('Powercord Path', powercord.basePath)}
             {createPathReveal('Discord Path', discordPath)}
-            <div className='full-column'>Experiments:&#10;{getExperimentOverrides() ? Object.keys(getExperimentOverrides()).join(', ') : 'n/a'}</div>
+            <div className='full-column'>Experiments:&#10;{experimentOverrides ? Object.keys(getExperimentOverrides()).join(', ') : 'n/a'}</div>
             <div className='full-column'>Labs:&#10;
               {enabledLabs.length ? enabledLabs.map(e => e.name).join(', ') : 'n/a'}
             </div>
             <div className='full-column'>
-              Plugins:&#10;{(plugins.length > 1 && `${(this.state.pluginsRevealed ? plugins : plugins.slice(0, 6)).join(', ')}; `) || 'n/a'}
+              Plugins:&#10;
+              {(plugins.length > 6 ? `${(this.state.pluginsRevealed ? plugins : plugins.slice(0, 6)).join(', ')}` : plugins.join(', ')) || 'n/a'}&nbsp;
               {plugins.length > 6 &&
               <Clickable tag='a' onClick={() => this.setState({ pluginsRevealed: !this.state.pluginsRevealed })}>
                 {this.state.pluginsRevealed ? 'Show less' : 'Show more'}
@@ -432,15 +430,15 @@ module.exports = class UpdaterSettings extends React.Component {
           color={this.state.copied ? Button.Colors.GREEN : Button.Colors.BRAND}
           onClick={() => this.handleDebugInfoCopy(moment, plugins)}
         >
-          {this.state.copied ? 'Copied!' : 'Copy'}
+          <FontAwesome icon={this.state.copied ? 'clipboard-check' : 'clipboard'}/> {this.state.copied ? 'Copied!' : 'Copy'}
         </Button>
       </div>}
     />;
   }
 
   handleDebugInfoCopy (moment, plugins) {
-    const extract = document.querySelector('.debugInfo > code')
-      .innerText.replace(/(.*?):(?=\s(?!C:\\).*?:)/g, '\n[$1]').replace(/(.*?):\s(.*.+)/g, '$1="$2"').replace(/[ -](\w*(?=.*=))/g, '$1');
+    const extract = document.querySelector('.debug-info > code')
+      .innerText.replace(/([A-Z/ ]+) (?=\s(?!C:\\).*?:)/g, '\n[$1]').replace(/(.*?):\s(.*.+)/g, '$1="$2"').replace(/[ -](\w*(?=.*=))/g, '$1');
 
     this.setState({ copied: true });
     clipboard.writeText(

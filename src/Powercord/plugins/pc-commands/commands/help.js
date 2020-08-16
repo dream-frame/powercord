@@ -38,7 +38,10 @@ module.exports = {
             name: 'Usage',
             value: `\`${command.usage.replace('{c}', powercord.api.commands.prefix + command.command)}\n\``,
             inline: false
-          } ]
+          } ],
+          footer: {
+            text: `Inherited from "${command.origin}".`
+          }
         };
       }
     }
@@ -54,12 +57,11 @@ module.exports = {
     }
 
     return {
-      commands: powercord.api.commands
-        .filter(command =>
-          command.command
-            .toLowerCase()
-            .includes((args[0] || '').toLowerCase())
-        ),
+      commands: powercord.api.commands.filter(command =>
+        [ command.command, ...(command.aliases || []) ].some(commandName =>
+          commandName.includes(args[0])
+        )
+      ),
       header: 'powercord command list'
     };
   }

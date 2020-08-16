@@ -1,9 +1,9 @@
 const { existsSync } = require('fs');
 const { writeFile, readFile } = require('fs').promises;
 const { React, constants: { Permissions }, getModule, getModuleByDisplayName, i18n: { Messages } } = require('powercord/webpack');
-const { Icons: { Plugin: PluginIcon, Theme } } = require('powercord/components');
+const { PopoutWindow, Icons: { Plugin: PluginIcon, Theme } } = require('powercord/components');
 const { inject, uninject } = require('powercord/injector');
-const { forceUpdateElement } = require('powercord/util');
+const { findInReactTree, forceUpdateElement } = require('powercord/util');
 const { Plugin } = require('powercord/entities');
 const { MAGIC_CHANNELS: { CSS_SNIPPETS, STORE_PLUGINS, STORE_THEMES } } = require('powercord/constants');
 const { join } = require('path');
@@ -15,8 +15,10 @@ const i18n = require('./licenses/index');
 const Store = require('./components/store/Store');
 const Plugins = require('./components/manage/Plugins');
 const Themes = require('./components/manage/Themes');
+const QuickCSS = require('./components/manage/QuickCSS');
 const SnippetButton = require('./components/SnippetButton');
 
+// @todo: give a look to why quickcss.css file shits itself
 module.exports = class ModuleManager extends Plugin {
   async startPlugin () {
     powercord.api.i18n.loadAllStrings(i18n);
@@ -71,7 +73,10 @@ module.exports = class ModuleManager extends Plugin {
     powercord.api.settings.registerSettings('pc-moduleManager-themes', {
       category: this.entityID,
       label: () => Messages.POWERCORD_THEMES,
-      render: Themes
+      render: (props) => React.createElement(Themes, {
+        openPopout: () => this._openQuickCSSPopout(),
+        ...props
+      })
     });
 
     if (powercord.api.labs.isExperimentEnabled('pc-moduleManager-deeplinks')) {
@@ -111,8 +116,7 @@ module.exports = class ModuleManager extends Plugin {
   async _injectCommunityContent () {
     const permissionsModule = await getModule([ 'can' ]);
     inject('pc-moduleManager-channelItem', permissionsModule, 'can', (args, res) => {
-      const id = args[1].channelId || args[1].id;
-      if (id === STORE_PLUGINS || id === STORE_THEMES) {
+      if (args[2].id === STORE_PLUGINS || args[2].id === STORE_THEMES) {
         return args[0] === Permissions.VIEW_CHANNEL;
       }
       return res;
@@ -153,37 +157,22 @@ module.exports = class ModuleManager extends Plugin {
   }
 
   async _injectSnippets () {
-    const Message = await getModule(m => m.default && m.default.displayName === 'Message');
-    inject('pc-moduleManager-snippets', Message, 'default', (args, res) => {
-      if (!res.props.children[2] || !res.props.children[2].props.children || res.props.children[2].props.children.type.__powercord_modm === 'owo') {
+    const MiniPopover = await getModule(m => m.default && m.default.displayName === 'MiniPopover');
+    inject('pc-moduleManager-snippets', MiniPopover, 'default', (args, res) => {
+      const props = findInReactTree(res, r => r && r.message && r.setPopout);
+      if (!props || props.channel.id !== CSS_SNIPPETS) {
         return res;
       }
 
-      res.props.children[2].props.children.type.__powercord_modm = 'owo';
-      const renderer = res.props.children[2].props.children.type.type;
-      res.props.children[2].props.children.type.type = (props) => {
-        const res = renderer(props);
-        const actions = res && res.props.children && res.props.children.props.children && res.props.children.props.children[1];
-        if (actions) {
-          const renderer = actions.type;
-          actions.type = (props) => {
-            const res = renderer(props);
-            if (props.channel.id === CSS_SNIPPETS && (/```(?:(?:s?css)|(?:styl(?:us)?)|less)/i).test(props.message.content)) {
-              res.props.children.unshift(
-                React.createElement(SnippetButton, {
-                  message: props.message,
-                  main: this
-                })
-              );
-            }
-            return res;
-          };
-        }
-        return res;
-      };
+      res.props.children.unshift(
+        React.createElement(SnippetButton, {
+          message: props.message,
+          main: this
+        })
+      );
       return res;
     });
-    Message.default.displayName = 'Message';
+    MiniPopover.default.displayName = 'MiniPopover';
   }
 
   async _applySnippet (message) {
@@ -266,5 +255,15 @@ module.exports = class ModuleManager extends Plugin {
     this._quickCSS = css.trim();
     this._quickCSSElement.innerHTML = this._quickCSS;
     await writeFile(this._quickCSSFile, this._quickCSS);
+  }
+
+  async _openQuickCSSPopout () {
+    const popoutModule = await getModule([ 'setAlwaysOnTop', 'open' ]);
+    popoutModule.open('DISCORD_POWERCORD_QUICKCSS', (key) => (
+      React.createElement(PopoutWindow, {
+        windowKey: key,
+        title: 'QuickCSS'
+      }, React.createElement(QuickCSS, { popout: true }))
+    ));
   }
 };

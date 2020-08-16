@@ -1,10 +1,10 @@
+const { join } = require('path');
 const { shell: { openExternal } } = require('electron');
 const { get } = require('powercord/http');
 const { sleep } = require('powercord/util');
 const Webpack = require('powercord/webpack');
 const { WEBSITE } = require('powercord/constants');
 const { Updatable } = require('powercord/entities');
-const { join } = require('path');
 
 const { promisify } = require('util');
 const cp = require('child_process');
@@ -14,6 +14,7 @@ const PluginManager = require('./managers/plugins');
 const StyleManager = require('./managers/styles');
 const APIManager = require('./managers/apis');
 const modules = require('./modules');
+let coremods;
 
 /**
  * @typedef PowercordAPI
@@ -117,6 +118,8 @@ class Powercord extends Updatable {
     this.styleManager.loadThemes();
 
     // Plugins
+    coremods = require('./coremods');
+    await coremods.load();
     await this.pluginManager.startPlugins();
 
     this.initialized = true;
@@ -127,6 +130,7 @@ class Powercord extends Updatable {
     this.initialized = false;
     // Plugins
     await this.pluginManager.shutdownPlugins();
+    await coremods.unload();
 
     // Style Manager
     this.styleManager.unloadThemes();
@@ -143,6 +147,7 @@ class Powercord extends Updatable {
       await sleep(1);
     }
 
+    await DiscordNative.nativeModules.ensureModule('discord_rpc');
     const discordRpc = DiscordNative.nativeModules.requireModule('discord_rpc');
     const { createServer } = discordRpc.RPCWebSocket.http;
     discordRpc.RPCWebSocket.http.createServer = function () {

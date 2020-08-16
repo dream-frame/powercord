@@ -18,7 +18,7 @@ module.exports = class Tags extends Plugin {
     powercord.api.commands.registerCommand({
       command: 'tag',
       description: 'Send, preview and manage your tags',
-      usage: '{c} <view|list|add|edit|delete> <tagName> [tagContent]',
+      usage: '{c} <view|list|add|update|delete> <tagName> [tagContent]',
       executor: (args) => {
         const subcommand = commands[args[0]];
         if (!subcommand) {
@@ -39,7 +39,7 @@ module.exports = class Tags extends Plugin {
         }
 
         const subcommand = commands[args[0]];
-        if (!subcommand) {
+        if (!subcommand || !subcommand.autocomplete) {
           return false;
         }
 
@@ -74,7 +74,7 @@ module.exports = class Tags extends Plugin {
 
   unregisterTags () {
     for (const tag of this.settings.getKeys()) {
-      this.registerTag(tag);
+      this.unregisterTag(tag);
     }
   }
 

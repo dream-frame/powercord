@@ -1,4 +1,3 @@
-const { remote } = require('electron');
 const { React, getModule, i18n: { Messages } } = require('powercord/webpack');
 const { Icons: { FontAwesome } } = require('powercord/components');
 const { open: openModal, close: closeModal } = require('powercord/modal');
@@ -30,22 +29,13 @@ module.exports = class GeneralSettings extends React.Component {
         />
         <TextInput
           defaultValue={getSetting('prefix', '.')}
-          onChange={p => updateSetting('prefix', !p ? '.' : p)}
+          onChange={p => updateSetting('prefix', !p ? '.' : p.replace(/\s+(?=\S)|(?<=\s)\s+/g, '').toLowerCase())}
+          onBlur={({ target }) => target.value = getSetting('prefix', '.')}
+          error={getSetting('prefix', '.') === '/' ? 'Prefix should not be set to `/` as it is already in use by Discord and may disable Powercord autocompletions.' : ''}
         >
           {Messages.POWERCORD_COMMAND_PREFIX}
         </TextInput>
-        <SwitchItem
-          note={Messages.POWERCORD_SETTINGS_SYNC_DESC}
-          value={powercord.account && getSetting('settingsSync', false)}
-          disabled={!powercord.account}
-          onChange={() => {
-            if (!getSetting('settingsSync', false)) {
-              this.passphrase(true);
-            } else {
-              toggleSetting('settingsSync');
-            }
-          }}
-        >
+        <SwitchItem note={'Settings sync is currently not available.'} disabled>
           {Messages.POWERCORD_SETTINGS_SYNC}
         </SwitchItem>
         <SwitchItem
@@ -72,13 +62,21 @@ module.exports = class GeneralSettings extends React.Component {
           >
             {Messages.POWERCORD_SETTINGS_DEBUG_LOGS}
           </SwitchItem>
-          <SwitchItem
-            note={Messages.POWERCORD_SETTINGS_OVERLAY_DESC}
-            value={getSetting('openOverlayDevTools', false)}
-            onChange={() => toggleSetting('openOverlayDevTools')}
-          >
-            {Messages.POWERCORD_SETTINGS_OVERLAY}
-          </SwitchItem>
+          {powercord.api.labs.isExperimentEnabled('pc-sdk')
+            ? <SwitchItem
+              note={'Powercord\'s SDK is a toolkit made to make plugin and theme developer\'s life easier. Once enabled, you can access it through the icon at the top right hand corner of Discord.'}
+              value={getSetting('sdkEnabled', false)}
+              onChange={() => toggleSetting('sdkEnabled')}
+            >
+              Enable Powercord SDK
+            </SwitchItem>
+            : <SwitchItem
+              note={Messages.POWERCORD_SETTINGS_OVERLAY_DESC}
+              value={getSetting('openOverlayDevTools', false)}
+              onChange={() => toggleSetting('openOverlayDevTools')}
+            >
+              {Messages.POWERCORD_SETTINGS_OVERLAY}
+            </SwitchItem>}
           <SwitchItem
             note={Messages.POWERCORD_SETTINGS_KEEP_TOKEN_DESC}
             value={getSetting('hideToken', true)}
@@ -164,18 +162,20 @@ module.exports = class GeneralSettings extends React.Component {
 
   clearDiscordCache () {
     this.setState({ discordCleared: true });
-    remote.getCurrentWindow().webContents.session.clearCache(() => void 0);
-    setTimeout(() => {
-      this.setState({ discordCleared: false });
-    }, 2500);
+    PowercordNative.clearCache().then(() => {
+      setTimeout(() => {
+        this.setState({ discordCleared: false });
+      }, 2500);
+    });
   }
 
   clearPowercordCache () {
     this.setState({ powercordCleared: true });
-    rmdirRf(CACHE_FOLDER);
-    setTimeout(() => {
-      this.setState({ powercordCleared: false });
-    }, 2500);
+    rmdirRf(CACHE_FOLDER).then(() => {
+      setTimeout(() => {
+        this.setState({ powercordCleared: false });
+      }, 2500);
+    });
   }
 
   askRestart () {
@@ -184,7 +184,7 @@ module.exports = class GeneralSettings extends React.Component {
       header={Messages.ERRORS_RESTART_APP}
       confirmText={Messages.BUNDLE_READY_RESTART}
       cancelText={Messages.BUNDLE_READY_LATER}
-      onConfirm={() => window.reloadElectronApp()}
+      onConfirm={() => DiscordNative.app.relaunch()}
       onCancel={closeModal}
     >
       <div className='powercord-text'>

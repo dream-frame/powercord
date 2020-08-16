@@ -1,5 +1,7 @@
 const { join } = require('path');
 
+require('./ipc/renderer');
+
 window.__SPLASH__ = true;
 
 // Add Powercord's modules
@@ -18,5 +20,3 @@ if (document.readyState === 'loading') {
 } else {
   init();
 }
-
-// require('electron').remote.getCurrentWebContents().openDevTools({ mode: 'detach' });

@@ -1,7 +1,8 @@
 {
   "name": "powercord",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "A lightweight @discord client mod focused on simplicity and performance",
+  "license": "SEE LICENSE IN LICENSE",
   "main": "index.js",
   "scripts": {
     "test": "jest",
@@ -11,24 +12,19 @@
     "inject": "node injectors/index.js inject",
     "uninject": "node injectors/index.js uninject"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/powercord-org/powercord.git"
-  },
-  "keywords": [],
+  "repository": "https://github.com/powercord-org/powercord.git",
   "author": "aetheryx",
-  "license": "GPL-3.0",
   "bugs": {
     "url": "https://github.com/powercord-org/powercord/issues"
   },
-  "homepage": "https://github.com/powercord-org/powercord#readme",
   "dependencies": {
     "codemirror": "^5.54.0",
     "less": "^3.11.1",
     "node-watch": "^0.6.4",
-    "sass": "^1.26.5",
+    "sass": "^1.26.7",
     "stylus": "^0.54.7",
     "sucrase": "^3.15.0",
+    "system-font-families": "^0.4.1",
     "unzip-crx": "^0.2.0"
   },
   "devDependencies": {

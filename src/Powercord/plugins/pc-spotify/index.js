@@ -41,6 +41,7 @@ class Spotify extends Plugin {
     this.loadStylesheet('style.scss');
     this._injectModal();
     this._patchAutoPause();
+    spotify.fetchIsSpotifyProtocolRegistered();
     powercord.on('webSocketMessage:dealer.spotify.com', this._handleSpotifyMessage);
     SpotifyAPI.getPlayer().then(player => this._handlePlayerState(player));
     powercord.api.i18n.loadAllStrings(i18n);
@@ -92,9 +93,13 @@ class Spotify extends Plugin {
 
   _patchAutoPause (revert) {
     if (this.settings.get('noAutoPause', true)) {
+      const spotifyMdl = getModule([ 'initialize', 'wasAutoPaused' ], false);
       if (revert) {
+        spotifyMdl.wasAutoPaused = spotifyMdl._wasAutoPaused;
         spotify.pause = spotify._pause;
       } else {
+        spotifyMdl._wasAutoPaused = spotifyMdl.wasAutoPaused;
+        spotifyMdl.wasAutoPaused = () => false;
         spotify._pause = spotify.pause;
         spotify.pause = () => void 0;
       }

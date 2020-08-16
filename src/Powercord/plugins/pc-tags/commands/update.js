@@ -61,11 +61,13 @@ module.exports = {
       };
     }
 
-    return {
-      commands: [ {
-        command: `Enter the updated content of "${args[0]}"...`,
-        wildcard: true
-      } ]
-    };
+    if (args[2] === void 0) {
+      return {
+        commands: [ {
+          command: `Enter the updated content of "${args[0]}"...`,
+          wildcard: true
+        } ]
+      };
+    }
   }
 };

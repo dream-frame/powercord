@@ -8,7 +8,7 @@ const FormTitle = AsyncComponent.from(getModuleByDisplayName('FormTitle'));
 
 const documentCache = {};
 
-class DocPage extends React.Component {
+class DocPage extends React.PureComponent {
   constructor (props) {
     super(props);
 
@@ -39,7 +39,9 @@ class DocPage extends React.Component {
     document.contents.forEach(element => {
       switch (element.type) {
         case 'TITLE':
-          render.push(React.createElement(`h${element.depth}`, null, element.content));
+          render.push(React.createElement(`h${element.depth}`, {
+            id: element.content.replace(/[^\w]+/ig, '-').replace(/^-+|-+$/g, '').toLowerCase()
+          }, element.content));
           break;
         case 'TEXT':
           render.push(React.createElement('p', null, this._mdToReact(element.content)));
@@ -48,10 +50,12 @@ class DocPage extends React.Component {
           render.push(React.createElement(element.ordered ? 'ol' : 'ul', null, element.items.map(this._renderList.bind(this, element.ordered))));
           break;
         case 'NOTE':
-          render.push(<FormNotice
-            type={FormNotice.Types[element.color === 'INFO' ? 'PRIMARY' : element.color]}
-            body={this._mdToReact(element.content)}
-          />);
+          render.push(
+            <FormNotice
+              type={FormNotice.Types[element.color === 'INFO' ? 'PRIMARY' : element.color]}
+              body={this._mdToReact(element.content)}
+            />
+          );
           break;
         case 'CODEBLOCK':
           let className,
@@ -94,8 +98,8 @@ class DocPage extends React.Component {
 
     // render
     return <div>
-      <FormTitle tag='h2' className='powercord-documentation-title'>{document.name}</FormTitle>
-      <div className='powercord-documentation'>{render}</div>
+      <FormTitle tag='h2' className='powercord-docs-title'>{document.name}</FormTitle>
+      <div className='powercord-docs'>{render}</div>
     </div>;
   }
 
@@ -116,9 +120,16 @@ class DocPage extends React.Component {
   _transformReact (react) {
     return react.map(c => {
       if (c.type === 'a') {
+        // @todo: Deeplinks once it's ready (?)
         if (c.props.href.startsWith('#')) {
           const { href } = c.props;
-          c.props.onClick = () => this.props.setSection(href.substr(1));
+          const [ section, part ] = href.substr(1).split('##');
+          c.props.onClick = () => {
+            this.props.setSection(section);
+            if (part) {
+              setImmediate(() => this.props.onScrollTo(part));
+            }
+          };
           c.props.href = '#';
         } else {
           c.props.target = '_blank';
