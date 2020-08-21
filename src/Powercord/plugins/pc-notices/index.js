@@ -80,11 +80,4 @@ module.exports = class Notices extends Plugin {
       }
     });
   }
-
-  _unsupportedBuild () {
-    powercord.api.notices.sendAnnouncement('pc-unsupported-build', {
-      color: 'orange',
-      message: `Powercord does not support the ${window.GLOBAL_ENV.RELEASE_CHANNEL} release of Discord. Please use Canary for best results.`
-    });
-  }
 };
