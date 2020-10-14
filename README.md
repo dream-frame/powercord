@@ -1,4 +1,5 @@
 # Powercord for Discord Stable
+This project is planned to be discontinued after Powercord v3 is released. I(Korbs) highly recommend you do use Discord Canary for Powercord.
 ## Disclaimer
 Powercord for Discord stable is **__not recommended__** to be used as this is unofficial and unsupported, some things could break later on in the future.
 
