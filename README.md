@@ -1,5 +1,8 @@
+**DISCONTINUED**
+
+Please use the official repo from [Powercord](https://github.com/powercord-org/powercord)
+
 # Powercord for Discord Stable
-This project is planned to be discontinued after Powercord v3 is released. I(Korbs) highly recommend you do use Discord Canary for Powercord.
 ## Disclaimer
 Powercord for Discord stable is **__not recommended__** to be used as this is unofficial and unsupported, some things could break later on in the future.
 
@@ -19,4 +22,4 @@ cd powercord-for-discord-stable
 npm i
 npm run plug
 ```
-NOTE: If you're on Linux, run the last command as sudo.
+NOTE: If you're on Linux, run the last command as sudo.~~
